@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -44,6 +45,21 @@ export const getUniqueResources = (appConfig, resourcesApp) => {
   }
   const opened = appConfig.lg.map((el) => el.i);
   return resourcesApp.filter((el) => !opened.includes(el.owner + '__' + el.name));
+};
+
+export const fetchTcReadyRepos = async (server) => {
+  const response = await axios.get(
+    `${server}/api/v1/repos/search?topic=tc-ready&limit=1000`
+  );
+  const repos = response?.data?.data ?? [];
+  return new Set(
+    repos
+      .map((repo) => {
+        const owner = repo.owner?.username || repo.owner?.login || repo.owner?.name || '';
+        return `${owner.toLowerCase()}/${repo.name?.toLowerCase()}`;
+      })
+      .filter((slug) => slug !== '/')
+  );
 };
 
 // +

@@ -9,15 +9,9 @@ import { useTranslation } from 'react-i18next';
 import { AppContext, ReferenceContext } from '../../context';
 import { SelectResourcesLanguages, DialogUI, FeedbackDialog } from '../../components';
 
-import {
-  subjects,
-  blackListResources,
-  bibleSubjects,
-  obsSubjects,
-  langNames,
-} from '../../config/materials';
+import { subjects, bibleSubjects, obsSubjects, langNames } from '../../config/materials';
 import { defaultCard, server, columns } from '../../config/base';
-import { getUniqueResources, packageLangs } from '../../helper';
+import { fetchTcReadyRepos, getUniqueResources, packageLangs } from '../../helper';
 
 import LanguageIcon from '@mui/icons-material/Language';
 
@@ -87,14 +81,15 @@ function SearchResources({ anchorEl, onClose, open }) {
   };
 
   useEffect(() => {
-    axios
-      .get(
-        server +
-          '/api/v1/catalog/search?limit=1000&sort=lang,title' +
-          '&subject=' +
-          subjects.join(',')
-      )
-      .then((res) => {
+    const fetchResources = async () => {
+      try {
+        const tcReadyRepos = await fetchTcReadyRepos(server);
+        const res = await axios.get(
+          server +
+            '/api/v1/catalog/search?limit=1000&sort=lang,title' +
+            '&subject=' +
+            subjects.join(',')
+        );
         const result = res.data.data
           .map((el) => {
             return {
@@ -110,11 +105,8 @@ function SearchResources({ anchorEl, onClose, open }) {
           })
           .filter(
             (el) =>
-              !blackListResources.some(
-                (value) =>
-                  JSON.stringify(value) ===
-                  JSON.stringify({ owner: el.owner, name: el.name })
-              ) && languageResources.some((lang) => lang === el.languageId)
+              tcReadyRepos.has(`${el.owner}/${el.name}`) &&
+              languageResources.some((lang) => lang === el.languageId)
           );
         setResourcesApp((prev) => {
           if (prev && result) {
@@ -122,8 +114,12 @@ function SearchResources({ anchorEl, onClose, open }) {
           }
           return result;
         });
-      })
-      .catch((err) => console.log(err));
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchResources();
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [languageResources]);
