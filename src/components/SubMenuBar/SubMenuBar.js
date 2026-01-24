@@ -104,8 +104,8 @@ function SubMenuBar() {
 
   const handleGetResourcesLink = () => {
     const r = appConfig['lg'].map((el) => 'r=' + el.i.split('__').join('/')).join('&');
-    // Compress layout data for URL
-    const layoutCompressed = btoa(JSON.stringify(appConfig));
+    // Compress layout data for URL - only encode LG breakpoint for shorter URLs
+    const layoutCompressed = btoa(JSON.stringify(appConfig.lg));
     copyToClipboard(
       `${window.location.origin}/share?${r}&b=${bookId}&c=${chapter}&v=${verse}&l=${layoutCompressed}`
     );

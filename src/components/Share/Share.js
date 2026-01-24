@@ -49,7 +49,13 @@ export default function Share() {
     if (layoutData) {
       try {
         const decompressed = atob(layoutData); // Base64 decode
-        layout = JSON.parse(decompressed);
+        const lgLayout = JSON.parse(decompressed); // This is now only the LG layout
+        // Reconstruct full layout with lg from URL, md/sm generated from lg resources
+        layout = {
+          lg: lgLayout,
+          md: generateMdLayout(lgLayout),
+          sm: generateSmLayout(lgLayout),
+        };
       } catch (error) {
         console.warn('Failed to parse layout from URL:', error);
       }
@@ -137,6 +143,37 @@ export default function Share() {
       md,
       sm,
     };
+  };
+
+  // Generate MD layout from LG layout - extract resources and apply MD rules
+  const generateMdLayout = (lgLayout) => {
+    const resources = lgLayout.map(item => item.i.split('__').join('/'));
+    const mdHeight = Math.ceil(12 / Math.ceil(resources.length / 2));
+
+    return resources.map((el, index) => ({
+      w: 3,
+      h: mdHeight,
+      x: (index * 3) % 6,
+      y: Math.floor(index / 2) * mdHeight,
+      i: el.split('/').join('__'),
+      minW: 1,
+      minH: 3,
+    }));
+  };
+
+  // Generate SM layout from LG layout - extract resources and apply SM rules
+  const generateSmLayout = (lgLayout) => {
+    const resources = lgLayout.map(item => item.i.split('__').join('/'));
+
+    return resources.map((el, index) => ({
+      w: 1,
+      h: resources.length === 1 ? 8 : 4,
+      x: 0,
+      y: index * 4,
+      i: el.split('/').join('__'),
+      minH: 3,
+      minW: 1,
+    }));
   };
 
   const setResources = (resources, isOBS, providedLayout = null) => {
