@@ -1,6 +1,5 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
   background: {
     background: '#ebecf0',
     height: '100vh',
@@ -11,4 +10,4 @@ export const useStyles = makeStyles((theme) => ({
   },
   root: { maxWidth: '560px' },
   select: { width: '300px' },
-}));
+});

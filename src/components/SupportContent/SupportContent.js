@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
 import { useProjector } from '@texttree/projector-mode-rcl';

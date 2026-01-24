@@ -7,7 +7,7 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
-} from '@material-ui/core';
+} from '@mui/material';
 import { SettingsItem } from '.';
 import { AppContext } from '../../context';
 import { useStyles } from '../Settings/style';

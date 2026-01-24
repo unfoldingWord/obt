@@ -1,12 +1,11 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
-  select: { maxWidth: '100%', marginBottom: theme.spacing(2) },
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
+  select: { maxWidth: '100%', marginBottom: 2 },
   boxWrap: {
-    marginBottom: theme.spacing(2),
+    marginBottom: 2,
     width: '320px',
     height: '180px',
-    background: theme.palette.background.default,
+    background: 'background.default',
     border: '1px solid #ccc',
   },
   iframeWrap: {
@@ -20,12 +19,12 @@ export const useStyles = makeStyles((theme) => ({
   },
   iframe: {
     border: 'none',
-    background: theme.palette.background.paper,
+    background: 'background.paper',
   },
   fontWrap: {
-    marginTop: theme.spacing(1),
+    marginTop: 1,
     width: '300px',
-    marginBottom: theme.spacing(2),
+    marginBottom: 2,
   },
   settingsWrap: {
     display: 'flex',
@@ -34,6 +33,6 @@ export const useStyles = makeStyles((theme) => ({
     zIndex: 0,
     position: 'relative',
   },
-}));
+});
 
 export default useStyles;

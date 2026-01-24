@@ -55,11 +55,11 @@
 ```javascript
 import React from 'react';
 
-import { AppBar, Toolbar, Typography, InputBase } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, InputBase } from '@mui/material';
 
 import { SelectLanguages } from './components';
 
-import SearchIcon from '@material-ui/icons/Search';
+import SearchIcon from '@mui/icons-material/Search';
 
 import useStyles from './style';
 ```

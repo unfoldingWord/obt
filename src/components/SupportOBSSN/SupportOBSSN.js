@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { Card, useContent, useCardState } from 'translation-helps-rcl';
+import { Card, useCardState } from 'translation-helps-rcl';
 
 import { SupportContent } from '../SupportContent';
+import useContentSafe from '../../hooks/useContentSafe';
 
 export default function SupportOBSSN({
   title,
@@ -24,7 +25,7 @@ export default function SupportOBSSN({
     owner: resource.owner ?? 'door43-catalog',
     server,
   };
-  const { items, resourceStatus, markdown } = useContent(config);
+  const { items, resourceStatus, markdown } = useContentSafe(config);
 
   const {
     state: { item, headers, itemIndex },

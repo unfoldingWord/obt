@@ -7,7 +7,7 @@ import {
   Link,
   TextField,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 import axios from 'axios';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';

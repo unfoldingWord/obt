@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { Checkbox, FormControlLabel } from '@material-ui/core';
+import { Checkbox, FormControlLabel } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 import { AppContext } from '../../context';

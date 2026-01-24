@@ -1,14 +1,13 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
   divider: {
-    margin: theme.spacing(2, 0, 1),
+    margin: '16px 0 8px',
   },
   inputLabel: {
-    marginBottom: theme.spacing(1),
+    marginBottom: 1,
   },
   radioGroup: {
     display: 'flex',
     flexDirection: 'row',
   },
-}));
+});

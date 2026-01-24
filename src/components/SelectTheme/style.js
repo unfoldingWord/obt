@@ -1,7 +1,6 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
   select: {
-    width: theme.spacing(27),
+    width: 216, // 27 * 8
   },
-}));
+});

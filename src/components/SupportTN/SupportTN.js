@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 
-import { Card, useContent, useCardState } from 'translation-helps-rcl';
+import { Card, useCardState } from 'translation-helps-rcl';
 import { useTranslation } from 'react-i18next';
 
 import { AppContext } from '../../context';
 import { FrontModal, ButtonGroupUI, SupportContent } from '../../components';
+import useContentSafe from '../../hooks/useContentSafe';
 
 export default function SupportTN({
   title,
@@ -36,7 +37,7 @@ export default function SupportTN({
     httpConfig: { noCache: true },
   };
 
-  const { items, resourceStatus } = useContent({
+  const { items, resourceStatus } = useContentSafe({
     ...config,
   });
   const onIntroClick = () => {

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 
 import ReactMarkdown from 'react-markdown';
-import { Box, Link } from '@material-ui/core';
+import { Box, Link } from '@mui/material';
 
 import { ReferenceContext } from '../../context';
 import useStyles from './style';

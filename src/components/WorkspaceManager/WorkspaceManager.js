@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { Button, MenuItem } from '@material-ui/core';
+import { Button, MenuItem } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 import { AppContext, ReferenceContext } from '../../context';

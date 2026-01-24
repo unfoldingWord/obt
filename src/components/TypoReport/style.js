@@ -1,8 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+const useStyles = () => ({
   backdrop: {
-    zIndex: theme.zIndex.drawer + 1,
+    zIndex: 'drawer',
     color: '#fff',
   },
   errorMessage: {
@@ -15,6 +14,6 @@ const useStyles = makeStyles((theme) => ({
   finishDialogContent: {
     textAlign: 'center',
   },
-}));
+});
 
 export default useStyles;

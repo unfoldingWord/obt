@@ -1,9 +1,10 @@
 import React, { useEffect, useContext, useMemo } from 'react';
 
-import { Card, useContent, useCardState } from 'translation-helps-rcl';
+import { Card, useCardState } from 'translation-helps-rcl';
 
 import { AppContext } from '../../context';
 import { SupportContent } from '../../components';
+import useContentSafe from '../../hooks/useContentSafe';
 
 export default function SupportTA({
   title,
@@ -40,7 +41,7 @@ export default function SupportTA({
     httpConfig: { noCache: true },
   };
 
-  const { markdown, items, resourceStatus } = useContent({
+  const { markdown, items, resourceStatus } = useContentSafe({
     ...config,
   });
 

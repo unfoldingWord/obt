@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { Link } from '@material-ui/core';
+import { Link } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 import { AppContext } from '../../context';

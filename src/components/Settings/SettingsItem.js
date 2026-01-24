@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Divider, InputLabel } from '@material-ui/core';
+import { Divider, InputLabel } from '@mui/material';
 
 import { useStyles } from './style';
 

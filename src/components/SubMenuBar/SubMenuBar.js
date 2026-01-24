@@ -10,7 +10,7 @@ import {
   Menu,
   MenuItem,
   Toolbar,
-} from '@material-ui/core';
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 import { AppContext, ReferenceContext } from '../../context';
@@ -28,13 +28,11 @@ import {
   ProjectorAdd,
 } from '../../components';
 
-import AddIcon from '@material-ui/icons/Add';
-import MenuIcon from '@material-ui/icons/Menu';
-import MailRoundedIcon from '@material-ui/icons/MailRounded';
-import HelpRoundedIcon from '@material-ui/icons/HelpRounded';
-import ShareRoundedIcon from '@material-ui/icons/ShareRounded';
-
-import { useModalStyles, useStyles } from './style';
+import AddIcon from '@mui/icons-material/Add';
+import MenuIcon from '@mui/icons-material/Menu';
+import MailRoundedIcon from '@mui/icons-material/MailRounded';
+import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
+import ShareRoundedIcon from '@mui/icons-material/ShareRounded';
 
 import LogoOBT from './logo_obt.png';
 import LogoTT from './logo_tt.png';
@@ -62,9 +60,6 @@ function SubMenuBar() {
   const [openFeedbackDialog, setOpenFeedbackDialog] = useState(false);
   const [anchorAddMaterial, setAnchorAddMaterial] = useState(null);
   const [openAbout, setOpenAbout] = useState(false);
-
-  const classes = useStyles();
-  const modalClasses = useModalStyles();
 
   const handleClickAddMaterial = (event) => {
     setAnchorAddMaterial(event.currentTarget);
@@ -118,7 +113,7 @@ function SubMenuBar() {
 
   return (
     <AppBar className={'intro-appBar'} position="relative">
-      <Toolbar className={classes.grow}>
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
         <Box
           component="img"
           sx={{
@@ -128,12 +123,19 @@ function SubMenuBar() {
           src={theme === 'obt' ? LogoOBT : LogoTT}
         />
 
-        <div className={classes.centerButtons}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            whiteSpace: 'nowrap',
+          }}
+        >
           <SelectModeBible />
           <ShowReference />
           <ChapterSelect />
           <BookSelect />
-        </div>
+        </Box>
 
         <IconButton
           ref={menuRef}
@@ -160,7 +162,14 @@ function SubMenuBar() {
           keepMounted
           open={Boolean(anchorMainMenu) || openMainMenu}
           onClose={handleCloseMainMenu}
-          classes={modalClasses}
+          slotProps={{
+            paper: {
+              sx: {
+                boxShadow:
+                  '0 1px 1px 0 rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12),0 1px 3px 0 rgba(0,0,0,0.14)',
+              },
+            },
+          }}
           PopoverClasses={{ paper: 'intro-hamburger' }}
         >
           <MenuItem button={false} divider={true}>
@@ -206,7 +215,7 @@ function SubMenuBar() {
           </MenuItem>
 
           <MenuItem button={false} divider={true}>
-            <p className={classes.menu}>{t('Text_under_checkbox_error')}</p>
+            <p style={{ whiteSpace: 'break-spaces' }}>{t('Text_under_checkbox_error')}</p>
           </MenuItem>
           <MenuItem divider={true} onClick={handleGetResourcesLink}>
             <ListItemIcon>

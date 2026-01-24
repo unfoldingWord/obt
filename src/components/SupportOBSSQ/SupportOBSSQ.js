@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 
 import { ReferenceUtils } from 'bible-reference-rcl';
-import { Card, useContent, useCardState } from 'translation-helps-rcl';
+import { Card, useCardState } from 'translation-helps-rcl';
 import { useTranslation } from 'react-i18next';
 
 import { ButtonGroupUI, FrontModal, SupportContent } from '../../components';
+import useContentSafe from '../../hooks/useContentSafe';
 
 export default function SupportOBSSQ({
   title,
@@ -30,7 +31,7 @@ export default function SupportOBSSQ({
     server,
   };
 
-  const { markdown, items, resourceStatus } = useContent(config);
+  const { markdown, items, resourceStatus } = useContentSafe(config);
 
   const {
     state: { item, headers, filters, itemIndex },

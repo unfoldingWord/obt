@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 
 import ReactMarkdown from 'react-markdown';
-import { Box } from '@material-ui/core';
+import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 import { useOnScreen } from '../../hooks';

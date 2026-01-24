@@ -1,9 +1,8 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
-  textfield: { margin: theme.spacing(1) },
-  nameTextfield: { margin: theme.spacing(1), maxWidth: theme.spacing(38) },
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
+  textfield: { margin: 1 },
+  nameTextfield: { margin: 1, maxWidth: 304 }, // 38 * 8
   container: { display: 'flex', flexDirection: 'column' },
   link: { textDecoration: 'underline' },
-  circular: { margin: theme.spacing(4) },
-}));
+  circular: { margin: 4 },
+});

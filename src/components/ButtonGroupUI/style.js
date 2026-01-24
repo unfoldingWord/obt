@@ -1,18 +1,17 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
   root: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     '& > *': {
-      margin: theme.spacing(0),
+      margin: 0,
     },
   },
-}));
+});
 
-export const useButtonStyles = makeStyles((theme) => ({
+export const useButtonStyles = () => ({
   root: {
     fontWeight: 'bold',
   },
-}));
+});

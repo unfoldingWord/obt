@@ -11,12 +11,12 @@ import {
   Button,
   DialogTitle,
   IconButton,
-} from '@material-ui/core';
+  useTheme,
+} from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
-import CloseIcon from '@material-ui/icons/Close';
+import CloseIcon from '@mui/icons-material/Close';
 
-import useLocalTitleStyles from './style';
 import { Paper } from 'translation-helps-rcl/dist/components';
 
 function PaperComponent(props) {
@@ -43,7 +43,7 @@ function DialogUI({
   isClosable = true,
   draggable = true,
 }) {
-  const classesLocalTitle = useLocalTitleStyles();
+  const theme = useTheme();
   const { t } = useTranslation();
 
   return (
@@ -63,9 +63,11 @@ function DialogUI({
       {title && (
         <>
           <DialogTitle
-            className={
-              draggable ? classesLocalTitle.draggable : classesLocalTitle.undraggable
-            }
+            sx={{
+              margin: 0,
+              padding: 2,
+              cursor: draggable ? 'move' : 'default',
+            }}
             id={draggable ? 'draggable-dialog-title' : ''}
           >
             {title}
@@ -73,7 +75,12 @@ function DialogUI({
           {isClosable && (
             <IconButton
               aria-label="close"
-              className={classesLocalTitle.closeButton}
+              sx={{
+                position: 'absolute',
+                right: theme.spacing(1),
+                top: theme.spacing(1),
+                color: theme.palette.grey[500],
+              }}
               onClick={onClose}
             >
               <CloseIcon />
@@ -83,7 +90,7 @@ function DialogUI({
       )}
       <DialogContent className={classes.content}>{children}</DialogContent>
       {(primary?.onClick || secondary?.onClick) && (
-        <DialogActions className={classesLocalTitle.buttons}>
+        <DialogActions sx={{ marginBottom: 1, marginRight: 1 }}>
           {secondary?.onClick && (
             <Button
               onClick={secondary.onClick}

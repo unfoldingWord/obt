@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 
 import axios from 'axios';
-import { MenuItem, Menu, Button } from '@material-ui/core';
+import { MenuItem, Menu, Button, Box, useTheme } from '@mui/material';
 import { getXY } from 'resource-workspace-rcl';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
@@ -19,9 +19,7 @@ import {
 import { defaultCard, server, columns } from '../../config/base';
 import { getUniqueResources, packageLangs } from '../../helper';
 
-import LanguageIcon from '@material-ui/icons/Language';
-
-import { useStyles } from './style';
+import LanguageIcon from '@mui/icons-material/Language';
 
 function SearchResources({ anchorEl, onClose, open }) {
   const {
@@ -36,7 +34,7 @@ function SearchResources({ anchorEl, onClose, open }) {
   } = useContext(ReferenceContext);
 
   const { t } = useTranslation();
-  const classes = useStyles();
+  const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const [openFeedbackDialog, setOpenFeedbackDialog] = useState(false);
 
@@ -45,10 +43,11 @@ function SearchResources({ anchorEl, onClose, open }) {
   const { enqueueSnackbar } = useSnackbar();
   const handleAddMaterial = (item) => {
     setAppConfig((prev) => {
-      const next = { ...prev };
-      for (let k in next) {
-        const pos = getXY(appConfig[k], columns[k], defaultCard[k].h, defaultCard[k].w);
-        next[k] = next[k].concat({
+      const next = {};
+      for (let k in prev) {
+        // Use prev[k] (not appConfig[k]) to ensure we use the latest state in React 18
+        const pos = getXY(prev[k], columns[k], defaultCard[k].h, defaultCard[k].w);
+        next[k] = prev[k].concat({
           ...defaultCard[k],
           x: pos.x,
           y: pos.y,
@@ -156,8 +155,20 @@ function SearchResources({ anchorEl, onClose, open }) {
         blockLang = el.languageId;
         return (
           <div key={el.id}>
-            <p className={classes.divider}>{packageLangs(langNames[el.languageId])}</p>
-            <MenuItem className={classes.menu} onClick={() => handleAddMaterial(el)}>
+            <Box
+              component="p"
+              sx={{
+                backgroundColor: theme.palette.background.default,
+                margin: 1,
+                padding: '8px 16px',
+              }}
+            >
+              {packageLangs(langNames[el.languageId])}
+            </Box>
+            <MenuItem
+              sx={{ whiteSpace: 'break-spaces' }}
+              onClick={() => handleAddMaterial(el)}
+            >
               {el.title} ({el.owner})
             </MenuItem>
           </div>
@@ -165,7 +176,7 @@ function SearchResources({ anchorEl, onClose, open }) {
       } else {
         return (
           <MenuItem
-            className={classes.menu}
+            sx={{ whiteSpace: 'break-spaces' }}
             key={el.id}
             onClick={() => handleAddMaterial(el)}
           >
@@ -175,7 +186,18 @@ function SearchResources({ anchorEl, onClose, open }) {
       }
     });
 
-  const emptyMenuItems = <p className={classes.divider}>{t('No_resources')}</p>;
+  const emptyMenuItems = (
+    <Box
+      component="p"
+      sx={{
+        backgroundColor: theme.palette.background.default,
+        margin: 1,
+        padding: '8px 16px',
+      }}
+    >
+      {t('No_resources')}
+    </Box>
+  );
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -219,9 +241,17 @@ function SearchResources({ anchorEl, onClose, open }) {
         primary={{ text: t('Ok'), onClick: handleCloseDialog }}
       >
         <SelectResourcesLanguages />
-        <div className={classes.link} onClick={handleOpenFeedbackDialog}>
+        <Box
+          sx={{
+            marginTop: 5,
+            cursor: 'pointer',
+            color: 'gray',
+            textDecoration: 'underline',
+          }}
+          onClick={handleOpenFeedbackDialog}
+        >
           {t('If_no_language')}
-        </div>
+        </Box>
       </DialogUI>
     </>
   );

@@ -3,8 +3,10 @@
   transition: height 200ms ease;
 }
 .react-grid-item {
+  position: absolute;
   transition: all 200ms ease;
   transition-property: left, top;
+  box-sizing: border-box;
 }
 .react-grid-item img {
   pointer-events: none;

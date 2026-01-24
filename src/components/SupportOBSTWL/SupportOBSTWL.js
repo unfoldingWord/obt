@@ -1,10 +1,11 @@
 import React, { useEffect, useContext } from 'react';
 
-import { Box } from '@material-ui/core';
-import { Card, useContent, useCardState } from 'translation-helps-rcl';
+import { Box } from '@mui/material';
+import { Card, useCardState } from 'translation-helps-rcl';
 
 import { AppContext } from '../../context';
 import { ListWords, SupportContent } from '../../components';
+import useContentSafe from '../../hooks/useContentSafe';
 
 import {
   useListWordsReference,
@@ -39,7 +40,7 @@ export default function SupportOBSTWL({
     owner: resource.owner ?? 'door43-catalog',
     server,
   };
-  const { markdown, items, resourceStatus, tsvs } = useContent(config);
+  const { markdown, items, resourceStatus, tsvs } = useContentSafe(config);
 
   const { listWordsReference, listWordsChapter } = useListWordsReference(tsvs, bookId);
   const { uniqueWordsItems } = useSelectTypeUniqueWords(

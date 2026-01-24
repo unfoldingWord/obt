@@ -75,9 +75,15 @@ export function ReferenceContextProvider({ children }) {
   useEffect(() => {
     if (history.location.pathname !== '/' + bookId + '/' + chapter + '/' + verse) {
       history.push('/' + bookId + '/' + chapter + '/' + verse);
-      const oldReference = JSON.parse(localStorage.getItem('reference'));
+      let oldReference = null;
+      try {
+        const referenceStr = localStorage.getItem('reference');
+        oldReference = referenceStr ? JSON.parse(referenceStr) : null;
+      } catch (error) {
+        oldReference = null;
+      }
       const newReference = {
-        ...oldReference,
+        ...(oldReference || {}),
         [bookId === 'obs' ? 'obs' : 'bible']: { bookId, chapter, verse },
       };
       localStorage.setItem('reference', JSON.stringify(newReference));
@@ -93,9 +99,15 @@ export function ReferenceContextProvider({ children }) {
 
   useEffect(() => {
     if (history.location.pathname !== '/' + bookId + '/' + chapter + '/' + verse) {
-      const oldReference = JSON.parse(localStorage.getItem('reference'));
+      let oldReference = null;
+      try {
+        const referenceStr = localStorage.getItem('reference');
+        oldReference = referenceStr ? JSON.parse(referenceStr) : null;
+      } catch (error) {
+        oldReference = null;
+      }
       const newReference = {
-        ...oldReference,
+        ...(oldReference || {}),
         [locationReference.bookId === 'obs' ? 'obs' : 'bible']: { ...locationReference },
       };
       localStorage.setItem('reference', JSON.stringify(newReference));

@@ -1,8 +1,8 @@
-import { createTheme } from '@material-ui/core/styles';
+import { createTheme } from '@mui/material/styles';
 
 const obt = createTheme({
   palette: {
-    type: 'light',
+    mode: 'light',
     primary: {
       main: '#3f51b5',
       select: '#e3f6ff',
@@ -21,24 +21,27 @@ const obt = createTheme({
       main: '#f1f1f1',
     },
   },
-  overrides: {
-    current: {
-      color: '#ff0000',
-    },
+  components: {
     MuiAppBar: {
-      colorInherit: {
-        backgroundColor: '#3f51b5',
-        color: '#ffffff',
+      styleOverrides: {
+        colorInherit: {
+          backgroundColor: '#3f51b5',
+          color: '#ffffff',
+        },
       },
     },
     MuiInputBase: {
-      root: {
-        color: 'inherit',
+      styleOverrides: {
+        root: {
+          color: 'inherit',
+        },
       },
     },
     MuiListItemIcon: {
-      root: {
-        minWidth: '36px',
+      styleOverrides: {
+        root: {
+          minWidth: '36px',
+        },
       },
     },
   },
@@ -55,7 +58,7 @@ const obt = createTheme({
 
 const textTree = createTheme({
   palette: {
-    type: 'light',
+    mode: 'light',
     primary: {
       main: '#023047',
       select: '#dbe1e5',
@@ -74,21 +77,27 @@ const textTree = createTheme({
       main: '#ffb732',
     },
   },
-  overrides: {
+  components: {
     MuiAppBar: {
-      colorInherit: {
-        backgroundColor: '#023047',
-        color: '#ffb732',
+      styleOverrides: {
+        colorInherit: {
+          backgroundColor: '#023047',
+          color: '#ffb732',
+        },
       },
     },
     MuiInputBase: {
-      root: {
-        color: 'inherit',
+      styleOverrides: {
+        root: {
+          color: 'inherit',
+        },
       },
     },
     MuiListItemIcon: {
-      root: {
-        minWidth: '36px',
+      styleOverrides: {
+        root: {
+          minWidth: '36px',
+        },
       },
     },
   },
@@ -105,7 +114,7 @@ const textTree = createTheme({
 
 const dark = createTheme({
   palette: {
-    type: 'dark',
+    mode: 'dark',
     primary: {
       main: '#023047',
       select: '#3f5a68',
@@ -130,21 +139,27 @@ const dark = createTheme({
       main: '#8dc9e5',
     },
   },
-  overrides: {
+  components: {
     MuiAppBar: {
-      colorInherit: {
-        backgroundColor: '#023047',
-        color: '#8dc9e5',
+      styleOverrides: {
+        colorInherit: {
+          backgroundColor: '#023047',
+          color: '#8dc9e5',
+        },
       },
     },
     MuiInputBase: {
-      root: {
-        color: 'inherit',
+      styleOverrides: {
+        root: {
+          color: 'inherit',
+        },
       },
     },
     MuiListItemIcon: {
-      root: {
-        minWidth: '36px',
+      styleOverrides: {
+        root: {
+          minWidth: '36px',
+        },
       },
     },
   },

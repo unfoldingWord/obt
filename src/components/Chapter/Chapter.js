@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { Card, useContent } from 'translation-helps-rcl';
+import { Card } from 'translation-helps-rcl';
 
 import USFMContent from './USFMContent';
+import useContentSafe from '../../hooks/useContentSafe';
 
 export default function Chapter({
   title,
@@ -15,7 +16,7 @@ export default function Chapter({
   server,
 }) {
   const { bookId, chapter } = reference;
-  const content = useContent({
+  const content = useContentSafe({
     chapter: chapter,
     projectId: bookId,
     listRef: resource.ref,

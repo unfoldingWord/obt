@@ -1,30 +1,16 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+// Breakpoints should be used directly in sx prop
+export const useStyles = () => ({
   bookList: {
-    margin: theme.spacing(1),
-    columnGap: theme.spacing(3),
-    [theme.breakpoints.down('xs')]: {
-      columnCount: 1,
-    },
-    [theme.breakpoints.only('sm')]: {
-      columnCount: 2,
-    },
-    [theme.breakpoints.only('md')]: {
-      columnCount: 3,
-    },
-    [theme.breakpoints.only('lg')]: {
-      columnCount: 4,
-    },
-    [theme.breakpoints.up('xl')]: {
-      columnCount: 5,
-    },
+    margin: 1,
+    columnGap: 3,
+    // Breakpoints handled in sx prop: xs: { columnCount: 1 }, sm: { columnCount: 2 }, etc.
   },
-}));
+});
 
-export const useBookStyles = makeStyles((theme) => ({
+export const useBookStyles = () => ({
   root: {
     display: 'flex',
     minWidth: 'inherit',
   },
-}));
+});

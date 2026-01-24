@@ -41,13 +41,48 @@ export default function WorkSpaceWrap() {
 
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
-  const layout = useMemo(() => ({ ...appConfig }), [appConfig]);
+
+  // Deep clone the layout to ensure react-grid-layout detects changes in React 18
+  const layout = useMemo(() => {
+    const cloned = {};
+    for (const key in appConfig) {
+      if (Array.isArray(appConfig[key])) {
+        cloned[key] = appConfig[key].map((item) => ({ ...item }));
+      } else {
+        cloned[key] = appConfig[key];
+      }
+    }
+    return cloned;
+  }, [appConfig]);
+
+  // Calculate the number of cards for use as a key to force re-render
+  const cardCount = useMemo(() => {
+    return appConfig?.[breakpoint.name]?.length ?? 0;
+  }, [appConfig, breakpoint.name]);
+
+  const layoutRows = useMemo(() => {
+    const activeLayout = layout?.[breakpoint.name] ?? [];
+    if (!activeLayout.length) {
+      return 12;
+    }
+    const maxRows = activeLayout.reduce((max, item) => {
+      const itemBottom = (item?.y ?? 0) + (item?.h ?? 0);
+      return Math.max(max, itemBottom);
+    }, 0);
+    return Math.max(maxRows, 12);
+  }, [layout, breakpoint.name]);
 
   const onLayoutChange = (newLayout, _newLayout) => {
-    const oldAppConfig = JSON.parse(localStorage.getItem('appConfig'));
+    let oldAppConfig = null;
+    try {
+      const appConfigStr = localStorage.getItem('appConfig');
+      oldAppConfig = appConfigStr ? JSON.parse(appConfigStr) : null;
+    } catch (error) {
+      oldAppConfig = null;
+    }
     const type = getLayoutType(newLayout);
     const newAppConfig = {
-      ...oldAppConfig,
+      ...(oldAppConfig || {}),
       [type]: _newLayout,
     };
     localStorage.setItem('appConfig', JSON.stringify(newAppConfig));
@@ -55,15 +90,19 @@ export default function WorkSpaceWrap() {
   };
 
   const mainResources = resourcesApp
-    .filter((e) => appConfig.lg.map((e) => e.i).includes(e.owner + '__' + e.name))
-    .filter((e) =>
+    .filter((resource) =>
+      (appConfig[breakpoint.name] || [])
+        .map((item) => item.i)
+        .includes(resource.owner + '__' + resource.name)
+    )
+    .filter((resource) =>
       [
         'Open Bible Stories',
         'Bible',
         'Aligned Bible',
         'Hebrew Old Testament',
         'Greek New Testament',
-      ].includes(e.subject)
+      ].includes(resource.subject)
     );
 
   const compareMaterials = (resources, type) => {
@@ -135,13 +174,14 @@ export default function WorkSpaceWrap() {
   return (
     <>
       <Workspace
-        gridMargin={[15, 15]}
+        key={`workspace-${cardCount}`}
+        gridMargin={[1, 1]}
         autoResize={true}
         totalGridUnits={12}
         classes={classes}
         layout={layout}
         breakpoints={breakpoints}
-        rows={12}
+        rows={layoutRows}
         correctHeight={64}
         onBreakpointChange={onBreakpointChange}
         onLayoutChange={onLayoutChange}

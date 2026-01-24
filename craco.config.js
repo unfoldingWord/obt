@@ -1,12 +1,34 @@
+const path = require('path');
+const cracoBabelLoader = require('craco-babel-loader');
+
 module.exports = {
+  babel: {
+    plugins: [
+      '@babel/plugin-transform-optional-chaining',
+      '@babel/plugin-transform-nullish-coalescing-operator',
+    ],
+  },
+  plugins: [
+    {
+      plugin: cracoBabelLoader,
+      options: {
+        includes: [
+          path.resolve(__dirname, 'node_modules/react-draggable'),
+          path.resolve(__dirname, 'node_modules/@mui'),
+        ],
+      },
+    },
+  ],
   webpack: {
-    configure: {
-      optimization: {
+    configure: (webpackConfig) => {
+      // Keep existing optimization config
+      webpackConfig.optimization = {
+        ...webpackConfig.optimization,
         splitChunks: {
           cacheGroups: {
-            'vendor-material-ui': {
-              name: 'vendor-material-ui',
-              test: /[\\/]node_modules[\\/]@material-ui[\\/]/,
+            'vendor-mui': {
+              name: 'vendor-mui',
+              test: /[\\/]node_modules[\\/]@mui[\\/]/,
               chunks: 'initial',
               priority: 2,
             },
@@ -28,7 +50,9 @@ module.exports = {
         runtimeChunk: {
           name: 'manifest',
         },
-      },
+      };
+
+      return webpackConfig;
     },
   },
 };

@@ -1,14 +1,13 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
   circular: {
     display: 'flex',
     justifyContent: 'center',
-    marginTop: theme.spacing(3),
+    marginTop: 3,
   },
   sup: {
-    marginRight: theme.spacing(1 / 2),
+    marginRight: 0.5,
   },
-}));
+});
 
 export default useStyles;

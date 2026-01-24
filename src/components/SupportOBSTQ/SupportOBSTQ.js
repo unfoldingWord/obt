@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { Card, useContent, useCardState } from 'translation-helps-rcl';
+import { Card, useCardState } from 'translation-helps-rcl';
 
 import { SupportContent } from '../SupportContent';
+import useContentSafe from '../../hooks/useContentSafe';
 
 export default function SupportOBSTQ({
   title,
@@ -40,7 +41,7 @@ export default function SupportOBSTQ({
     items,
     resource: { ...resourceData },
     resourceStatus,
-  } = useContent(repoType === 'tsv' ? { ...tsvConfig } : { ...mdConfig });
+  } = useContentSafe(repoType === 'tsv' ? { ...tsvConfig } : { ...mdConfig });
   useEffect(() => {
     if (resourceData?.project?.path) {
       const path = resourceData.project.path;

@@ -257,10 +257,23 @@ export const scrollTo = (currentVerse, position) => {
 };
 
 export const switchModeBible = (type, goToBookChapterVerse, setAppConfig) => {
-  const curRef = JSON.parse(localStorage.getItem('reference'))[type];
-  const appConfig = JSON.parse(localStorage.getItem('appConfig'))[type];
-  setAppConfig(appConfig);
-  goToBookChapterVerse(curRef.bookId, curRef.chapter, curRef.verse);
+  let curRef = null;
+  let appConfig = null;
+  try {
+    const referenceStr = localStorage.getItem('reference');
+    const parsedRef = referenceStr ? JSON.parse(referenceStr) : null;
+    curRef = parsedRef && parsedRef[type] ? parsedRef[type] : null;
+
+    const appConfigStr = localStorage.getItem('appConfig');
+    const parsedConfig = appConfigStr ? JSON.parse(appConfigStr) : null;
+    appConfig = parsedConfig && parsedConfig[type] ? parsedConfig[type] : null;
+  } catch (error) {
+    // Handle error - curRef and appConfig will remain null
+  }
+  if (appConfig && curRef) {
+    setAppConfig(appConfig);
+    goToBookChapterVerse(curRef.bookId, curRef.chapter, curRef.verse);
+  }
 };
 
 const resetMode = (
@@ -313,11 +326,17 @@ export const resetWorkspace = ({
   resetAll,
 }) => {
   const workspaceType = resetAll ? 'all' : bookId === 'obs' ? 'obs' : 'bible';
-  const oldAppConfig = JSON.parse(localStorage.getItem('appConfig'));
+  let oldAppConfig = null;
+  try {
+    const appConfigStr = localStorage.getItem('appConfig');
+    oldAppConfig = appConfigStr ? JSON.parse(appConfigStr) : null;
+  } catch (error) {
+    oldAppConfig = null;
+  }
   switch (workspaceType) {
     case 'bible':
       const bibleAppConfig = {
-        ...oldAppConfig,
+        ...(oldAppConfig || {}),
         [workspaceType]: defaultTplBible[currentLanguage],
       };
       localStorage.setItem('appConfig', JSON.stringify(bibleAppConfig));
@@ -333,7 +352,7 @@ export const resetWorkspace = ({
 
     case 'obs':
       const obsAppConfig = {
-        ...oldAppConfig,
+        ...(oldAppConfig || {}),
         [workspaceType]: defaultTplOBS[currentLanguage],
       };
       localStorage.setItem('appConfig', JSON.stringify(obsAppConfig));
@@ -386,12 +405,18 @@ export const getLayoutType = (layout) => {
 };
 
 export const getLanguageIds = () => {
-  let oldAppConfig = JSON.parse(localStorage.getItem('appConfig'));
-  const allValues = [...Object.values(oldAppConfig)];
+  let oldAppConfig = null;
+  try {
+    const appConfigStr = localStorage.getItem('appConfig');
+    oldAppConfig = appConfigStr ? JSON.parse(appConfigStr) : null;
+  } catch (error) {
+    oldAppConfig = null;
+  }
   let currentLangs = new Set();
-  if (allValues) {
+  if (oldAppConfig) {
+    const allValues = [...Object.values(oldAppConfig)];
     allValues.forEach((value) => {
-      value.lg.forEach((el) => {
+      value?.lg?.forEach((el) => {
         currentLangs.add(el.i.split('__')[1]?.split('_')[0]);
       });
     });

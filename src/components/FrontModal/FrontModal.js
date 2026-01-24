@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { useContent } from 'translation-helps-rcl';
+import useContentSafe from '../../hooks/useContentSafe';
 
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 
 import { DialogUI, MarkdownViewer } from '../../components';
 
@@ -16,7 +16,7 @@ function FrontModal({
   title = false,
   isTSV = true,
 }) {
-  const data = useContent(config);
+  const data = useContentSafe(config);
   const { items, resourceStatus, markdown } = data;
   let content;
   if (isTSV) {

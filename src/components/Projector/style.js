@@ -1,6 +1,5 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles(() => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
   wrap: {
     display: 'flex',
     textAlign: 'center',
@@ -81,6 +80,6 @@ export const useStyles = makeStyles(() => ({
     fontSize: '25px',
     color: '#fdf5ea',
   },
-}));
+});
 
 export default useStyles;

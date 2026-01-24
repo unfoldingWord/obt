@@ -1,11 +1,12 @@
 import React, { useEffect, useContext } from 'react';
 
-import { Box } from '@material-ui/core';
-import { Card, useContent, useCardState } from 'translation-helps-rcl';
+import { Box } from '@mui/material';
+import { Card, useCardState } from 'translation-helps-rcl';
 
 import { AppContext } from '../../context';
 
 import { SupportContent, ListWords } from '../../components';
+import useContentSafe from '../../hooks/useContentSafe';
 
 import {
   useListWordsReference,
@@ -36,7 +37,7 @@ export default function SupportTWL(props) {
     httpConfig: { noCache: true },
   };
 
-  const { items, tsvs, resourceStatus } = useContent({
+  const { items, tsvs, resourceStatus } = useContentSafe({
     ...config,
   });
 

@@ -1,9 +1,8 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
   formControl: {
     width: '100%',
-    marginRight: theme.spacing(2),
+    marginRight: 2,
   },
 
   icon: { color: 'inherit' },
@@ -12,4 +11,4 @@ export const useStyles = makeStyles((theme) => ({
     fontSize: '0.875rem',
     fontWeight: '500',
   },
-}));
+});

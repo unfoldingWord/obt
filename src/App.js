@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 
-import { CssBaseline } from '@material-ui/core';
+import { CssBaseline, ThemeProvider } from '@mui/material';
+import { ThemeProvider as V4ThemeProvider } from '@material-ui/core/styles';
 
 import { AppContext } from './context';
 import {
@@ -14,7 +15,6 @@ import {
 import WorkSpaceWrap from './WorkSpaceWrap';
 
 import { themes } from './themes';
-import { ThemeProvider } from '@material-ui/styles';
 import './styles/app.css';
 import { LinkDialog } from './components';
 
@@ -32,13 +32,15 @@ export default function App() {
   Swipes();
   return (
     <ThemeProvider theme={themes[theme]}>
-      <CssBaseline />
-      <StartDialog />
-      <Intro />
-      <SubMenuBar />
-      <TypoReport />
-      <WorkSpaceWrap />
-      <LinkDialog />
+      <V4ThemeProvider theme={themes[theme]}>
+        <CssBaseline />
+        <StartDialog />
+        <Intro />
+        <SubMenuBar />
+        <TypoReport />
+        <WorkSpaceWrap />
+        <LinkDialog />
+      </V4ThemeProvider>
     </ThemeProvider>
   );
 }

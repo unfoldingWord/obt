@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 
-import { FormControl, Select, InputLabel, MenuItem } from '@material-ui/core';
+import { FormControl, Select, InputLabel, MenuItem } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
@@ -8,16 +8,13 @@ import { AppContext } from '../../context/AppContext';
 
 import { languages } from '../../config/base';
 
-import LanguageRoundedIcon from '@material-ui/icons/LanguageRounded';
-
-import { useStyles } from './style';
+import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded';
 
 export default function SelectLanguage({ label, style }) {
   const {
     state: { currentLanguage },
     actions: { setCurrentLanguage, setLanguageResources },
   } = useContext(AppContext);
-  const classes = useStyles();
 
   const { i18n, t } = useTranslation();
 
@@ -36,7 +33,7 @@ export default function SelectLanguage({ label, style }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage]);
   return (
-    <FormControl className={classes.formControl} style={style}>
+    <FormControl sx={{ width: '100%', ...style }}>
       {label && (
         <InputLabel id="lang-select-label">
           <LanguageRoundedIcon fontSize="small" /> {label}
@@ -45,12 +42,12 @@ export default function SelectLanguage({ label, style }) {
       <Select
         labelid="lang-select-label"
         disableUnderline={true}
-        className={label && classes.select}
+        sx={label ? { marginTop: '24px !important' } : {}}
         onChange={handleChange}
         value={currentLanguage}
       >
         {languages.map((el) => (
-          <MenuItem key={el} className={classes.option} value={el}>
+          <MenuItem key={el} sx={{ color: 'black' }} value={el}>
             {t(el)}
           </MenuItem>
         ))}

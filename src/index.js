@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 import { Projector } from '@texttree/projector-mode-rcl';
@@ -24,7 +24,9 @@ Migrate();
 ReactGA.initialize('G-381M7FJ40V', {
   testMode: !process.env.NODE_ENV || process.env.NODE_ENV === 'development',
 });
-ReactDOM.render(
+
+const root = createRoot(document.getElementById('root'));
+root.render(
   <ErrorBoundary>
     <BrowserRouter>
       <Switch>
@@ -43,8 +45,7 @@ ReactDOM.render(
         </ContextProviders>
       </Switch>
     </BrowserRouter>
-  </ErrorBoundary>,
-  document.getElementById('root')
+  </ErrorBoundary>
 );
 
 // If you want your app to work offline and load faster, you can change

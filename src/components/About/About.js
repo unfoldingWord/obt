@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 import ReactMarkdown from 'react-markdown';
-import { ListItemIcon, MenuItem } from '@material-ui/core';
+import { ListItemIcon, MenuItem } from '@mui/material';
 
 import { DialogUI } from '../../components';
 
-import InfoRoundedIcon from '@material-ui/icons/InfoRounded';
+import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 
 import changeLog from '../../docs/CHANGELOG.md';
 import * as PACKAGE_JSON from '../../../package.json';

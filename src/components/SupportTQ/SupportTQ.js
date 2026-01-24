@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { Card, useContent, useCardState } from 'translation-helps-rcl';
+import { Card, useCardState } from 'translation-helps-rcl';
 
 import { SupportContent } from '../SupportContent';
+import useContentSafe from '../../hooks/useContentSafe';
 
 export default function SupportTQ({
   title,
@@ -34,7 +35,7 @@ export default function SupportTQ({
     owner: resource.owner ?? 'door43-catalog',
     server,
   };
-  const { markdown, items, resourceStatus } = useContent(
+  const { markdown, items, resourceStatus } = useContentSafe(
     resource.subject === 'TSV Translation Questions' ? { ...tsvConfig } : { ...mdConfig }
   );
   const {

@@ -1,8 +1,7 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+const useStyles = () => ({
   twl: {
-    color: theme.palette.text.disabled,
+    color: 'text.disabled',
   },
-}));
+});
 export default useStyles;

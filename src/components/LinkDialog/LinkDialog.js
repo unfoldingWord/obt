@@ -6,7 +6,7 @@ import useDeepCompareEffect from 'use-deep-compare-effect';
 
 import { ReferenceContext } from '../../context';
 import { DialogUI, MarkdownViewer } from '../../components';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 
 function LinkDialog() {
   const [content, setContent] = useState('');

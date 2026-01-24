@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import { Box, Popover } from '@material-ui/core';
-import ListAltRoundedIcon from '@material-ui/icons/ListAltRounded';
+import { Box, Popover } from '@mui/material';
+import ListAltRoundedIcon from '@mui/icons-material/ListAltRounded';
 
 import { ListLinks } from '.';
 

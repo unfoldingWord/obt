@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 
-import { Stepper, Step, StepLabel, StepContent } from '@material-ui/core';
+import { Stepper, Step, StepLabel, StepContent } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 import { AppContext, ReferenceContext } from '../../context';

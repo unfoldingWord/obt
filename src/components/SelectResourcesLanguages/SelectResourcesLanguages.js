@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 
-import { TextField, Chip } from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import { TextField, Chip, Autocomplete } from '@mui/material';
 import { matchSorter } from 'match-sorter';
 
 import { AppContext } from '../../context';
@@ -35,11 +34,13 @@ function SelectResourcesLanguages() {
 
   let value = [];
   languageResources.forEach((el) => {
-    value.push({
-      title: packageLangs(langNames[el]),
-      id: el,
-      eng: langNames[el].eng,
-    });
+    if (langNames[el]) {
+      value.push({
+        title: packageLangs(langNames[el]),
+        id: el,
+        eng: langNames[el].eng,
+      });
+    }
   });
 
   const onChange = (event, newValue) => {
@@ -71,7 +72,7 @@ function SelectResourcesLanguages() {
         filterOptions={filterOptions}
         getOptionLabel={(option) => option.title}
         value={value}
-        getOptionSelected={(option, value) => option.id === value.id}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
         onChange={onChange}
         renderTags={renderTags}
         renderInput={(params) => <TextField {...params} variant="outlined" />}

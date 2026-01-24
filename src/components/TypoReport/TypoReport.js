@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 
 import { SendError } from '@texttree/user-notes-rcl';
-import { Backdrop, CircularProgress } from '@material-ui/core';
+import { Backdrop, CircularProgress } from '@mui/material';
 
 import { AppContext, ReferenceContext } from '../../context';
 import { FinishDialog, ReportDialog } from '..';

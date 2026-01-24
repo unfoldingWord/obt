@@ -15,9 +15,15 @@ import {
   MenuItem,
   TextField,
   Typography,
-} from '@material-ui/core';
+} from '@mui/material';
 
-const currentAppConfig = JSON.parse(localStorage.getItem('appConfig'));
+let currentAppConfig = null;
+try {
+  const appConfigStr = localStorage.getItem('appConfig');
+  currentAppConfig = appConfigStr ? JSON.parse(appConfigStr) : null;
+} catch (error) {
+  currentAppConfig = null;
+}
 
 export default function Share() {
   const classes = useStyles();

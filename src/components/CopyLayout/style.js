@@ -1,6 +1,5 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
   menuItemLayoutList: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -8,26 +7,26 @@ export const useStyles = makeStyles((theme) => ({
 
   elementNameLayoutList: {
     whiteSpace: 'normal',
-    maxWidth: theme.spacing(52),
+    maxWidth: 416, // 52 * 8
   },
 
   copyIcon: {
-    marginLeft: theme.spacing(2),
+    marginLeft: 2,
     '&:hover': {
-      color: theme.palette.info.main,
+      color: 'info.main',
     },
   },
 
   deleteIcon: {
     '&:hover': {
-      color: theme.palette.error.main,
+      color: 'error.main',
     },
   },
 
   select: {
-    width: theme.spacing(27),
+    width: 216, // 27 * 8
   },
   textField: {
     width: '210px',
   },
-}));
+});

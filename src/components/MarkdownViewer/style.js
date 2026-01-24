@@ -1,12 +1,11 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
   link: {
     cursor: 'pointer',
-    color: theme.palette.primary.main,
+    color: 'primary.main',
     display: 'inline-block',
     '&:hover': { textDecoration: 'underline' },
   },
-}));
+});
 
 export default useStyles;

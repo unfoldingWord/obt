@@ -1,6 +1,5 @@
-import { makeStyles } from '@material-ui/core/styles';
-
-export const useStyles = makeStyles((theme) => ({
+// Styles migrated to sx prop - this file kept for backward compatibility
+export const useStyles = () => ({
   option: {
     color: 'black',
   },
@@ -8,6 +7,6 @@ export const useStyles = makeStyles((theme) => ({
     width: '100%',
   },
   select: {
-    marginTop: theme.spacing(3) + 'px !important',
+    marginTop: '24px !important',
   },
-}));
+});

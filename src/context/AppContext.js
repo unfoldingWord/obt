@@ -145,7 +145,15 @@ export function AppContextProvider({ children }) {
     const type = getLayoutType(appConfig.lg);
     const newType = referenceSelected.bookId === 'obs' ? 'obs' : 'bible';
     if (type !== newType) {
-      setAppConfig(JSON.parse(localStorage.getItem('appConfig'))[newType]);
+      try {
+        const appConfigStr = localStorage.getItem('appConfig');
+        const parsedConfig = appConfigStr ? JSON.parse(appConfigStr) : null;
+        if (parsedConfig && parsedConfig[newType]) {
+          setAppConfig(parsedConfig[newType]);
+        }
+      } catch (error) {
+        // Handle error silently, appConfig will remain unchanged
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [referenceSelected.bookId]);

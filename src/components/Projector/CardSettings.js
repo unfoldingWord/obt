@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 
-import { Box, Button, MenuItem, Select, Typography } from '@material-ui/core';
+import { Box, Button, MenuItem, Select, Typography } from '@mui/material';
 import { Card, FontSizeSlider } from 'translation-helps-rcl';
 import { useTranslation } from 'react-i18next';
 import { useProjector, usePreview } from '@texttree/projector-mode-rcl';

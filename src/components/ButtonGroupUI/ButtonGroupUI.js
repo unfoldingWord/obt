@@ -1,26 +1,31 @@
 import React from 'react';
 
-import { ButtonGroup, Button } from '@material-ui/core';
-
-import { useStyles, useButtonStyles } from './style';
+import { ButtonGroup, Button, Box } from '@mui/material';
 
 export default function ButtonGroupUI({
   buttons = [],
   buttonGroupProps = {},
   style = {},
 }) {
-  const classes = useStyles();
-  const classesButton = useButtonStyles();
-
   return (
-    <div className={classes.root} style={style}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        '& > *': {
+          margin: 0,
+        },
+        ...style,
+      }}
+    >
       <ButtonGroup {...buttonGroupProps}>
         {buttons.map((el, index) => (
-          <Button key={index} className={classesButton.root} onClick={el.onClick}>
+          <Button key={index} sx={{ fontWeight: 'bold' }} onClick={el.onClick}>
             {el.title}
           </Button>
         ))}
       </ButtonGroup>
-    </div>
+    </Box>
   );
 }

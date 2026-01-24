@@ -1,10 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react';
 
-import { Card, useContent } from 'translation-helps-rcl';
-import { CircularProgress } from '@material-ui/core';
+import { Card } from 'translation-helps-rcl';
+import { CircularProgress } from '@mui/material';
 
 import { AppContext, ReferenceContext } from '../../context';
 import OBSContent from './OBSContent';
+import useContentSafe from '../../hooks/useContentSafe';
 
 import { server } from '../../config/base';
 
@@ -31,7 +32,7 @@ export default function OBSVerses({ title, classes, onClose, type }) {
       resource = el;
     }
   });
-  const { markdown, resourceStatus } = useContent({
+  const { markdown, resourceStatus } = useContentSafe({
     projectId: 'obs',
     listRef: resource.ref ?? 'master',
     languageId: resource.languageId ?? 'ru',

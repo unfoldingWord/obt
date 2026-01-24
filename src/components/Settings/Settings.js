@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { InputLabel, ListItemIcon, MenuItem } from '@material-ui/core';
+import { InputLabel, ListItemIcon, MenuItem } from '@mui/material';
 import { FontSizeSlider } from 'translation-helps-rcl';
 import { useTranslation } from 'react-i18next';
 
@@ -19,7 +19,7 @@ import {
   SwitchUniqueWords,
 } from '../../components';
 
-import SettingsRoundedIcon from '@material-ui/icons/SettingsRounded';
+import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 
 import { useStyles } from './style';
 

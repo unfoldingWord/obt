@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 
-import { Box, DialogContentText, TextField } from '@material-ui/core';
+import { Box, DialogContentText, TextField } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 import { ReferenceContext } from '../../context';

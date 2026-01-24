@@ -4,7 +4,7 @@ import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 
 import { Verse } from '@texttree/scripture-resources-rcl';
-import { Box, CircularProgress, Button } from '@material-ui/core';
+import { Box, CircularProgress, Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useProjector } from '@texttree/projector-mode-rcl';
 
