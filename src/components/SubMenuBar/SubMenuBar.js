@@ -104,8 +104,10 @@ function SubMenuBar() {
 
   const handleGetResourcesLink = () => {
     const r = appConfig['lg'].map((el) => 'r=' + el.i.split('__').join('/')).join('&');
+    // Compress layout data for URL
+    const layoutCompressed = btoa(JSON.stringify(appConfig));
     copyToClipboard(
-      `${window.location.origin}/share?${r}&b=${bookId}&c=${chapter}&v=${verse}`
+      `${window.location.origin}/share?${r}&b=${bookId}&c=${chapter}&v=${verse}&l=${layoutCompressed}`
     );
   };
 

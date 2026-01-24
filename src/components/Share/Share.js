@@ -42,10 +42,23 @@ export default function Share() {
     const bookId = params.get('b');
     const chapter = parseInt(params.get('c'));
     const verse = parseInt(params.get('v'));
-    return { resources, bookId, chapter, verse };
+    const layoutData = params.get('l'); // New layout parameter
+    let layout = null;
+
+    // Parse layout data if present
+    if (layoutData) {
+      try {
+        const decompressed = atob(layoutData); // Base64 decode
+        layout = JSON.parse(decompressed);
+      } catch (error) {
+        console.warn('Failed to parse layout from URL:', error);
+      }
+    }
+
+    return { resources, bookId, chapter, verse, layout };
   }, []);
 
-  const { resources, bookId, chapter, verse } = getDataFromURI(search);
+  const { resources, bookId, chapter, verse, layout } = getDataFromURI(search);
 
   const setReference = ({ bookId, chapter, verse }) => {
     const currentReference = JSON.parse(localStorage.getItem('reference'));
@@ -126,24 +139,26 @@ export default function Share() {
     };
   };
 
-  const setResources = (resources, isOBS) => {
+  const setResources = (resources, isOBS, providedLayout = null) => {
     // get App Config
     const defaultAppConfig = {
       obs: defaultTplOBS['en'],
       bible: defaultTplBible['en'],
     };
 
-    const newLayout = getNewLayout(resources);
+    // Use provided layout from URL, or generate new one
+    const layoutToUse = providedLayout || getNewLayout(resources);
+
     if (currentAppConfig === null) {
       localStorage.setItem(
         'appConfig',
-        JSON.stringify({ ...defaultAppConfig, [isOBS ? 'obs' : 'bible']: newLayout })
+        JSON.stringify({ ...defaultAppConfig, [isOBS ? 'obs' : 'bible']: layoutToUse })
       );
       return;
     }
     localStorage.setItem(
       'appConfig',
-      JSON.stringify({ ...currentAppConfig, [isOBS ? 'obs' : 'bible']: newLayout })
+      JSON.stringify({ ...currentAppConfig, [isOBS ? 'obs' : 'bible']: layoutToUse })
     );
 
     const langs = currentAppConfig[isOBS ? 'obs' : 'bible']['lg'].map(
@@ -249,7 +264,7 @@ export default function Share() {
         if (saveOption === 'old') {
           setReference({ bookId, chapter, verse });
           setLanguages(resources);
-          setResources(resources, bookId === 'obs');
+          setResources(resources, bookId === 'obs', layout);
         } else {
           saveNewResources(resources, bookId === 'obs');
         }
