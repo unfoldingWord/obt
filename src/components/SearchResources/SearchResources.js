@@ -11,7 +11,7 @@ import { SelectResourcesLanguages, DialogUI, FeedbackDialog } from '../../compon
 
 import { subjects, bibleSubjects, obsSubjects, langNames } from '../../config/materials';
 import { defaultCard, server, columns } from '../../config/base';
-import { fetchTcReadyRepos, getUniqueResources, packageLangs } from '../../helper';
+import { fetchTcReadyRepos, getRepoSlug, getUniqueResources, packageLangs } from '../../helper';
 
 import LanguageIcon from '@mui/icons-material/Language';
 
@@ -105,7 +105,7 @@ function SearchResources({ anchorEl, onClose, open }) {
           })
           .filter(
             (el) =>
-              tcReadyRepos.has(`${el.owner}/${el.name}`) &&
+              tcReadyRepos.has(getRepoSlug(el.owner, el.name)) &&
               languageResources.some((lang) => lang === el.languageId)
           );
         setResourcesApp((prev) => {
@@ -116,6 +116,8 @@ function SearchResources({ anchorEl, onClose, open }) {
         });
       } catch (err) {
         console.log(err);
+        setResourcesApp([]);
+        enqueueSnackbar(t('No_resources_found'), { variant: 'warning' });
       }
     };
 

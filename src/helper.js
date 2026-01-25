@@ -47,6 +47,10 @@ export const getUniqueResources = (appConfig, resourcesApp) => {
   return resourcesApp.filter((el) => !opened.includes(el.owner + '__' + el.name));
 };
 
+export const getRepoSlug = (owner, name) => {
+  return `${(owner ?? '').toString().toLowerCase()}/${(name ?? '').toString().toLowerCase()}`;
+};
+
 export const fetchTcReadyRepos = async (server) => {
   const response = await axios.get(
     `${server}/api/v1/repos/search?topic=tc-ready&limit=1000`
@@ -56,7 +60,7 @@ export const fetchTcReadyRepos = async (server) => {
     repos
       .map((repo) => {
         const owner = repo.owner?.username || repo.owner?.login || repo.owner?.name || '';
-        return `${owner.toLowerCase()}/${repo.name?.toLowerCase()}`;
+        return getRepoSlug(owner, repo.name);
       })
       .filter((slug) => slug !== '/')
   );
