@@ -17,20 +17,21 @@ import {
   Typography,
 } from '@mui/material';
 
-let currentAppConfig = null;
-try {
-  const appConfigStr = localStorage.getItem('appConfig');
-  currentAppConfig = appConfigStr ? JSON.parse(appConfigStr) : null;
-} catch (error) {
-  currentAppConfig = null;
-}
-
 export default function Share() {
   const classes = useStyles();
 
   const { t } = useTranslation();
 
   const { search } = useLocation();
+
+  const [currentAppConfig] = useState(() => {
+    try {
+      const appConfigStr = localStorage.getItem('appConfig');
+      return appConfigStr ? JSON.parse(appConfigStr) : null;
+    } catch (error) {
+      return null;
+    }
+  });
 
   const [saveOption, setSaveOption] = useState('old');
   const [newName, setNewName] = useState(t('Autosave'));
