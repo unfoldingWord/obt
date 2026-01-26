@@ -48,7 +48,9 @@ export const getUniqueResources = (appConfig, resourcesApp) => {
 };
 
 export const getRepoSlug = (owner, name) => {
-  return `${(owner ?? '').toString().toLowerCase()}/${(name ?? '').toString().toLowerCase()}`;
+  return `${(owner ?? '').toString().toLowerCase()}/${(name ?? '')
+    .toString()
+    .toLowerCase()}`;
 };
 
 export const fetchTcReadyRepos = async (server) => {
