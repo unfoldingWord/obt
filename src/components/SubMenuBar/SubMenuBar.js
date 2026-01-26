@@ -103,9 +103,32 @@ function SubMenuBar() {
   }, []);
 
   const handleGetResourcesLink = () => {
-    const r = appConfig['lg'].map((el) => 'r=' + el.i.split('__').join('/')).join('&');
-    // Compress layout data for URL - only encode LG breakpoint for shorter URLs
-    const layoutCompressed = encodeURIComponent(btoa(JSON.stringify(appConfig.lg)));
+    // Group resources by owner to reduce URL length
+    const groups = {};
+    const layoutOrdered = [];
+
+    appConfig.lg.forEach((el) => {
+      const [owner, repo] = el.i.split('__');
+      if (!groups[owner]) {
+        groups[owner] = [];
+      }
+      groups[owner].push({ repo, layout: [el.w, el.h, el.x, el.y] });
+    });
+
+    const rParams = [];
+
+    // Build r params and sync layout order
+    Object.keys(groups).forEach((owner) => {
+      const repos = groups[owner].map((item) => item.repo).join(',');
+      rParams.push(`r=${owner}/${repos}`);
+      groups[owner].forEach((item) => {
+        layoutOrdered.push(item.layout);
+      });
+    });
+
+    const r = rParams.join('&');
+    const layoutCompressed = encodeURIComponent(btoa(JSON.stringify(layoutOrdered)));
+
     copyToClipboard(
       `${window.location.origin}/share?${r}&b=${bookId}&c=${chapter}&v=${verse}&l=${layoutCompressed}`
     );

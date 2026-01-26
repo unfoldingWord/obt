@@ -69,7 +69,22 @@ export default function Share() {
 
   const getDataFromURI = useCallback((search) => {
     const params = new URLSearchParams(search);
-    const resources = params.getAll('r');
+    const resources = [];
+
+    // Parse grouped resources (e.g. owner/repo1,repo2)
+    params.getAll('r').forEach((param) => {
+      const parts = param.split('/');
+      if (parts.length === 2) {
+        const [owner, reposStr] = parts;
+        reposStr.split(',').forEach((repo) => {
+          resources.push(`${owner}/${repo}`);
+        });
+      } else {
+        // Fallback for non-grouped legacy links
+        resources.push(param);
+      }
+    });
+
     const bookId = params.get('b');
     const chapter = parseInt(params.get('c'));
     const verse = parseInt(params.get('v'));
@@ -80,7 +95,21 @@ export default function Share() {
     if (layoutData) {
       try {
         const decompressed = atob(layoutData); // Base64 decode
-        const lgLayout = JSON.parse(decompressed); // This is now only the LG layout
+        const simpleLayout = JSON.parse(decompressed); // Array of arrays [w, h, x, y]
+
+        // Reconstruct full LG layout from simple positional array
+        const lgLayout = simpleLayout.map((item, index) => ({
+          w: item[0],
+          h: item[1],
+          x: item[2],
+          y: item[3],
+          i: resources[index].split('/').join('__'),
+          minW: 1,
+          minH: 3,
+          moved: false,
+          static: false,
+        }));
+
         // Reconstruct full layout with lg from URL, md/sm generated from lg resources
         layout = {
           lg: lgLayout,
