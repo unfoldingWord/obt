@@ -36,6 +36,37 @@ export default function Share() {
   const [newName, setNewName] = useState(t('Autosave'));
   const [reload, setReload] = useState(() => currentAppConfig === null);
 
+  // Generate MD layout from LG layout - extract resources and apply MD rules
+  const generateMdLayout = (lgLayout) => {
+    const resources = lgLayout.map((item) => item.i.split('__').join('/'));
+    const mdHeight = Math.ceil(12 / Math.ceil(resources.length / 2));
+
+    return resources.map((el, index) => ({
+      w: 3,
+      h: mdHeight,
+      x: (index * 3) % 6,
+      y: Math.floor(index / 2) * mdHeight,
+      i: el.split('/').join('__'),
+      minW: 1,
+      minH: 3,
+    }));
+  };
+
+  // Generate SM layout from LG layout - extract resources and apply SM rules
+  const generateSmLayout = (lgLayout) => {
+    const resources = lgLayout.map((item) => item.i.split('__').join('/'));
+
+    return resources.map((el, index) => ({
+      w: 1,
+      h: resources.length === 1 ? 8 : 4,
+      x: 0,
+      y: index * 4,
+      i: el.split('/').join('__'),
+      minH: 3,
+      minW: 1,
+    }));
+  };
+
   const getDataFromURI = useCallback((search) => {
     const params = new URLSearchParams(search);
     const resources = params.getAll('r');
@@ -145,37 +176,6 @@ export default function Share() {
     };
   };
 
-  // Generate MD layout from LG layout - extract resources and apply MD rules
-  const generateMdLayout = (lgLayout) => {
-    const resources = lgLayout.map(item => item.i.split('__').join('/'));
-    const mdHeight = Math.ceil(12 / Math.ceil(resources.length / 2));
-
-    return resources.map((el, index) => ({
-      w: 3,
-      h: mdHeight,
-      x: (index * 3) % 6,
-      y: Math.floor(index / 2) * mdHeight,
-      i: el.split('/').join('__'),
-      minW: 1,
-      minH: 3,
-    }));
-  };
-
-  // Generate SM layout from LG layout - extract resources and apply SM rules
-  const generateSmLayout = (lgLayout) => {
-    const resources = lgLayout.map(item => item.i.split('__').join('/'));
-
-    return resources.map((el, index) => ({
-      w: 1,
-      h: resources.length === 1 ? 8 : 4,
-      x: 0,
-      y: index * 4,
-      i: el.split('/').join('__'),
-      minH: 3,
-      minW: 1,
-    }));
-  };
-
   const setResources = (resources, isOBS, providedLayout = null) => {
     // get App Config
     const defaultAppConfig = {
@@ -198,9 +198,7 @@ export default function Share() {
       JSON.stringify({ ...currentAppConfig, [isOBS ? 'obs' : 'bible']: layoutToUse })
     );
 
-    const langs = currentAppConfig[isOBS ? 'obs' : 'bible']['lg'].map(
-      (el) => el.i.split('__')[1].split('_')[0]
-    );
+    const langs = layoutToUse.lg.map((el) => el.i.split('__')[1].split('_')[0]);
     // save to layoutStorage
     let newLayoutName = newName;
     const currentLayoutStorage = JSON.parse(localStorage.getItem('layoutStorage'));
