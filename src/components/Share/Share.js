@@ -227,7 +227,9 @@ export default function Share() {
       JSON.stringify({ ...currentAppConfig, [isOBS ? 'obs' : 'bible']: layoutToUse })
     );
 
-    const langs = layoutToUse.lg.map((el) => el.i.split('__')[1].split('_')[0]);
+    const langs = currentAppConfig[isOBS ? 'obs' : 'bible'].lg.map(
+      (el) => el.i.split('__')[1].split('_')[0]
+    );
     // save to layoutStorage
     let newLayoutName = newName;
     const currentLayoutStorage = JSON.parse(localStorage.getItem('layoutStorage'));
