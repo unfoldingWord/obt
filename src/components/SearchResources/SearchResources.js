@@ -121,7 +121,6 @@ function SearchResources({ anchorEl, onClose, open }) {
         });
       } catch (err) {
         console.log(err);
-        setResourcesApp([]);
         enqueueSnackbar(t('No_resources_found'), { variant: 'warning' });
       }
     };
