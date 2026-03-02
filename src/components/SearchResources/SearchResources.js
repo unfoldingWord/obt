@@ -40,6 +40,9 @@ function SearchResources({ anchorEl, onClose, open }) {
   const prevResources = useRef([]);
   const uniqueResources = getUniqueResources(appConfig, resourcesApp);
   const { enqueueSnackbar } = useSnackbar();
+  const hasSelectedLanguage = (languageId) =>
+    languageResources.some((lang) => lang === languageId);
+
   const handleAddMaterial = (item) => {
     setAppConfig((prev) => {
       const next = {};
@@ -111,7 +114,7 @@ function SearchResources({ anchorEl, onClose, open }) {
           .filter(
             (el) =>
               tcReadyRepos.has(getRepoSlug(el.owner, el.name)) &&
-              languageResources.some((lang) => lang === el.languageId)
+              hasSelectedLanguage(el.languageId)
           );
         setResourcesApp((prev) => {
           if (prev && result) {
@@ -121,6 +124,9 @@ function SearchResources({ anchorEl, onClose, open }) {
         });
       } catch (err) {
         console.log(err);
+        setResourcesApp((prev) =>
+          (prev || []).filter((resource) => hasSelectedLanguage(resource.languageId))
+        );
         enqueueSnackbar(t('No_resources_found'), { variant: 'warning' });
       }
     };

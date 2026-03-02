@@ -54,10 +54,27 @@ export const getRepoSlug = (owner, name) => {
 };
 
 export const fetchTcReadyRepos = async (server) => {
-  const response = await axios.get(
-    `${server}/api/v1/repos/search?topic=tc-ready&limit=1000`
-  );
-  const repos = response?.data?.data ?? [];
+  const repos = [];
+  const perPage = 25;
+  let page = 1;
+
+  while (true) {
+    const response = await axios.get(`${server}/api/v1/repos/search`, {
+      params: {
+        topic: 'tc-ready',
+        limit: perPage,
+        page,
+      },
+    });
+    const pageRepos = response?.data?.data ?? [];
+    repos.push(...pageRepos);
+
+    if (pageRepos.length < perPage) {
+      break;
+    }
+    page += 1;
+  }
+
   return new Set(
     repos
       .map((repo) => {
