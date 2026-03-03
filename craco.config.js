@@ -13,7 +13,6 @@ module.exports = {
       plugin: cracoBabelLoader,
       options: {
         includes: [
-          path.resolve(__dirname, 'node_modules/react-draggable'),
           path.resolve(__dirname, 'node_modules/@mui'),
         ],
       },
@@ -21,6 +20,15 @@ module.exports = {
   ],
   webpack: {
     configure: (webpackConfig) => {
+      webpackConfig.resolve = {
+        ...webpackConfig.resolve,
+        fallback: {
+          ...(webpackConfig.resolve?.fallback || {}),
+          buffer: require.resolve('buffer/'),
+          path: require.resolve('path-browserify'),
+        },
+      };
+
       // Keep existing optimization config
       webpackConfig.optimization = {
         ...webpackConfig.optimization,
@@ -45,7 +53,8 @@ module.exports = {
               priority: 1,
             },
           },
-          maxSize: 7000000,
+          // Keep initial chunks under CRA's Workbox precache warning threshold (5 MB).
+          maxSize: 4900000,
         },
         runtimeChunk: {
           name: 'manifest',

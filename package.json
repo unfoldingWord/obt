@@ -69,9 +69,9 @@
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "start": "NODE_OPTIONS=--openssl-legacy-provider craco --max_old_space_size=8192 start",
+    "start": "craco --max_old_space_size=8192 start",
     "serve": "serve -s build",
-    "build": "NODE_OPTIONS=--openssl-legacy-provider craco --max_old_space_size=8192 build",
+    "build": "craco --max_old_space_size=8192 build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },
@@ -94,21 +94,24 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^6.4.5",
+    "@craco/craco": "^7.1.0",
+    "ajv": "^8.18.0",
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.25.0",
     "@babel/plugin-transform-optional-chaining": "^7.25.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^14.4.3",
     "craco-babel-loader": "^1.0.4",
+    "buffer": "^6.0.3",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.0",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "path-browserify": "^1.0.1",
     "prettier": "^2.7.1",
-    "react-scripts": "^4.0.3",
+    "react-scripts": "^5.0.1",
     "serve": "^13.0.2",
     "source-map-explorer": "^2.5.2"
   },
