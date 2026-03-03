@@ -54,7 +54,8 @@ module.exports = {
               priority: 1,
             },
           },
-          maxSize: 7000000,
+          // Keep initial chunks under CRA's Workbox precache warning threshold (5 MB).
+          maxSize: 4900000,
         },
         runtimeChunk: {
           name: 'manifest',
