@@ -31,7 +31,7 @@
   <h3 align="center">OPEN BIBLE TEXT</h3>
 
   <p align="center">
-    An application for advanced Bible study using opensource materials from git.door43.org.
+    An application for advanced Bible study using open-source materials from git.door43.org.
     <br />
     <br />
     <a href="https://openbibletext.com/">View Production</a>
