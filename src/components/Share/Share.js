@@ -37,6 +37,18 @@ export default function Share() {
   const [newName, setNewName] = useState(t('Autosave'));
   const [reload, setReload] = useState(() => currentAppConfig === null);
 
+  const isValidLayoutItem = (item) => {
+    return (
+      Array.isArray(item) &&
+      item.length === 4 &&
+      item.every((value) => Number.isFinite(value)) &&
+      item[0] > 0 &&
+      item[1] > 0 &&
+      item[2] >= 0 &&
+      item[3] >= 0
+    );
+  };
+
   // Generate MD layout from LG layout - extract resources and apply MD rules
   const generateMdLayout = (lgLayout) => {
     const resources = lgLayout.map((item) => item.i.split('__').join('/'));
@@ -97,6 +109,15 @@ export default function Share() {
       try {
         const decompressed = atob(layoutData); // Base64 decode
         const simpleLayout = JSON.parse(decompressed); // Array of arrays [w, h, x, y]
+
+        // Any mismatch means we should ignore provided layout and regenerate safely.
+        if (
+          !Array.isArray(simpleLayout) ||
+          simpleLayout.length !== resources.length ||
+          simpleLayout.some((item) => !isValidLayoutItem(item))
+        ) {
+          throw new Error('Invalid layout payload');
+        }
 
         // Reconstruct full LG layout from simple positional array
         const lgLayout = simpleLayout.map((item, index) => ({
@@ -277,10 +298,10 @@ export default function Share() {
     }
   };
 
-  const saveNewResources = (resources, isOBS) => {
-    const newLayout = getNewLayout(resources);
+  const saveNewResources = (resources, isOBS, providedLayout = null) => {
+    const layoutToSave = providedLayout || getNewLayout(resources);
 
-    const langs = newLayout['lg'].map((el) => el.i.split('__')[1].split('_')[0]);
+    const langs = layoutToSave.lg.map((el) => el.i.split('__')[1].split('_')[0]);
 
     // save to layoutStorage
     let newLayoutName = newName;
@@ -291,7 +312,7 @@ export default function Share() {
         JSON.stringify([
           {
             name: newLayoutName,
-            value: newLayout,
+            value: layoutToSave,
             language: [...new Set(langs)],
             isOBS,
           },
@@ -306,7 +327,7 @@ export default function Share() {
     }
 
     const isLayoutSaved = currentLayoutStorage.every((item) => {
-      return JSON.stringify(item.value) !== JSON.stringify(newLayout);
+      return JSON.stringify(item.value) !== JSON.stringify(layoutToSave);
     });
 
     if (isLayoutSaved) {
@@ -316,7 +337,7 @@ export default function Share() {
           ...currentLayoutStorage,
           {
             name: newLayoutName,
-            value: newLayout,
+            value: layoutToSave,
             language: [...new Set(langs)],
             isOBS,
           },
@@ -333,7 +354,7 @@ export default function Share() {
           setLanguages(resources);
           setResources(resources, bookId === 'obs', layout);
         } else {
-          saveNewResources(resources, bookId === 'obs');
+          saveNewResources(resources, bookId === 'obs', layout);
         }
       }
       const params = new URLSearchParams(window.location.search);
