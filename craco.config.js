@@ -13,7 +13,6 @@ module.exports = {
       plugin: cracoBabelLoader,
       options: {
         includes: [
-          path.resolve(__dirname, 'node_modules/react-draggable'),
           path.resolve(__dirname, 'node_modules/@mui'),
         ],
       },
