@@ -21,6 +21,15 @@ module.exports = {
   ],
   webpack: {
     configure: (webpackConfig) => {
+      webpackConfig.resolve = {
+        ...webpackConfig.resolve,
+        fallback: {
+          ...(webpackConfig.resolve?.fallback || {}),
+          buffer: require.resolve('buffer/'),
+          path: require.resolve('path-browserify'),
+        },
+      };
+
       // Keep existing optimization config
       webpackConfig.optimization = {
         ...webpackConfig.optimization,

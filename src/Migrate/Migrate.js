@@ -1,7 +1,7 @@
 import { migrate211015 } from './migrate211015';
 import { migrate211029 } from './migrate211029';
 import { migrate220222 } from './migrate220222';
-import * as package_json from '../../package.json';
+import packageJson from '../../package.json';
 
 export const VERSION_KEY = 'version';
 /**
@@ -27,7 +27,7 @@ const getVersion = () => {
   let lsVersion = localStorage.getItem(VERSION_KEY);
   if (lsVersion === null) {
     if (localStorage.getItem('appConfig') === null) {
-      lsVersion = package_json.version;
+      lsVersion = packageJson.version;
     } else {
       lsVersion = '1.1.0';
     }
