@@ -145,12 +145,26 @@ export default function Share() {
       return null;
     }
 
-    const usedResources = new Set(requiredTypes.map((type) => selectedLanguageLayout[type]));
+    const usedResources = new Set(
+      requiredTypes.map((type) => selectedLanguageLayout[type])
+    );
     const extraResources = resources.filter((resource) => !usedResources.has(resource));
 
     const specialLayout = [
-      { w: 4, h: 12, x: 0, y: 0, i: selectedLanguageLayout.literal.split('/').join('__') },
-      { w: 4, h: 6, x: 4, y: 0, i: selectedLanguageLayout.simplified.split('/').join('__') },
+      {
+        w: 4,
+        h: 12,
+        x: 0,
+        y: 0,
+        i: selectedLanguageLayout.literal.split('/').join('__'),
+      },
+      {
+        w: 4,
+        h: 6,
+        x: 4,
+        y: 0,
+        i: selectedLanguageLayout.simplified.split('/').join('__'),
+      },
       { w: 4, h: 6, x: 4, y: 6, i: selectedLanguageLayout.twl.split('/').join('__') },
       { w: 4, h: 6, x: 8, y: 0, i: selectedLanguageLayout.tn.split('/').join('__') },
       { w: 4, h: 6, x: 8, y: 6, i: selectedLanguageLayout.ta.split('/').join('__') },
