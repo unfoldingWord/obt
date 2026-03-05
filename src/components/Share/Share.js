@@ -80,6 +80,93 @@ export default function Share() {
     }));
   };
 
+  const getRepoName = (resource) => {
+    const parts = (resource || '').split('/');
+    return parts[1] || '';
+  };
+
+  const getLanguageId = (resource) => getRepoName(resource).split('_')[0];
+
+  const getResourceType = (resource) => {
+    const repoName = getRepoName(resource).toLowerCase();
+
+    if (repoName.endsWith('_ult') || repoName.endsWith('_glt')) return 'literal';
+    if (repoName.endsWith('_ust') || repoName.endsWith('_gst')) return 'simplified';
+    if (repoName.endsWith('_tn')) return 'tn';
+    if (repoName.endsWith('_twl')) return 'twl';
+    if (repoName.endsWith('_ta')) return 'ta';
+
+    return null;
+  };
+
+  const buildGenericLgLayout = (resources, startY = 0) => {
+    const lgHeight = Math.ceil(12 / Math.ceil(resources.length / 3));
+
+    return resources.map((el, index) => ({
+      w: resources.length === 1 ? 8 : 4,
+      h: lgHeight,
+      x: (index * 4) % 12,
+      y: startY + Math.floor(index / 3) * lgHeight,
+      i: el.split('/').join('__'),
+      minW: 1,
+      minH: 3,
+    }));
+  };
+
+  const buildLanguageDefaultLgLayout = (resources) => {
+    const requiredTypes = ['literal', 'simplified', 'tn', 'twl', 'ta'];
+    const typedByLanguage = new Map();
+
+    resources.forEach((resource) => {
+      const languageId = getLanguageId(resource);
+      const resourceType = getResourceType(resource);
+      if (!languageId || !resourceType) return;
+
+      if (!typedByLanguage.has(languageId)) {
+        typedByLanguage.set(languageId, {});
+      }
+
+      const current = typedByLanguage.get(languageId);
+      if (!current[resourceType]) {
+        current[resourceType] = resource;
+      }
+    });
+
+    let selectedLanguageLayout = null;
+    for (const [, langResources] of typedByLanguage.entries()) {
+      const hasAllRequired = requiredTypes.every((type) => !!langResources[type]);
+      if (hasAllRequired) {
+        selectedLanguageLayout = langResources;
+        break;
+      }
+    }
+
+    if (!selectedLanguageLayout) {
+      return null;
+    }
+
+    const usedResources = new Set(requiredTypes.map((type) => selectedLanguageLayout[type]));
+    const extraResources = resources.filter((resource) => !usedResources.has(resource));
+
+    const specialLayout = [
+      { w: 4, h: 12, x: 0, y: 0, i: selectedLanguageLayout.literal.split('/').join('__') },
+      { w: 4, h: 6, x: 4, y: 0, i: selectedLanguageLayout.simplified.split('/').join('__') },
+      { w: 4, h: 6, x: 4, y: 6, i: selectedLanguageLayout.twl.split('/').join('__') },
+      { w: 4, h: 6, x: 8, y: 0, i: selectedLanguageLayout.tn.split('/').join('__') },
+      { w: 4, h: 6, x: 8, y: 6, i: selectedLanguageLayout.ta.split('/').join('__') },
+    ].map((item) => ({
+      ...item,
+      minW: 1,
+      minH: 3,
+    }));
+
+    if (extraResources.length === 0) {
+      return specialLayout;
+    }
+
+    return [...specialLayout, ...buildGenericLgLayout(extraResources, 12)];
+  };
+
   const getDataFromURI = useCallback((search) => {
     const params = new URLSearchParams(search);
     const resources = [];
@@ -188,37 +275,9 @@ export default function Share() {
 
   const getNewLayout = (resources) => {
     // create new layout
-    const lgHeight = Math.ceil(12 / Math.ceil(resources.length / 3));
-
-    const lg = resources.map((el, index) => ({
-      w: resources.length === 1 ? 8 : 4,
-      h: lgHeight,
-      x: (index * 4) % 12,
-      y: Math.floor(index / 3) * lgHeight,
-      i: el.split('/').join('__'),
-      minW: 1,
-      minH: 3,
-    }));
-    const mdHeight = Math.ceil(12 / Math.ceil(resources.length / 2));
-
-    const md = resources.map((el, index) => ({
-      w: 3,
-      h: mdHeight,
-      x: (index * 3) % 6,
-      y: Math.floor(index / 2) * mdHeight,
-      i: el.split('/').join('__'),
-      minW: 1,
-      minH: 3,
-    }));
-    const sm = resources.map((el, index) => ({
-      w: 1,
-      h: resources.length === 1 ? 8 : 4,
-      x: 0,
-      y: index * 4,
-      i: el.split('/').join('__'),
-      minH: 3,
-      minW: 1,
-    }));
+    const lg = buildLanguageDefaultLgLayout(resources) || buildGenericLgLayout(resources);
+    const md = generateMdLayout(lg);
+    const sm = generateSmLayout(lg);
 
     return {
       lg,
