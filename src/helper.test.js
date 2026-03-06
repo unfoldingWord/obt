@@ -7,7 +7,8 @@ jest.mock('axios', () => ({
 
 import axios from 'axios';
 
-import { fetchTcReadyRepos, getRepoSlug } from './helper';
+import { defaultTplBible } from './config/base';
+import { fetchTcReadyRepos, getRepoSlug, getDefaultBibleLayout } from './helper';
 
 describe('getRepoSlug', () => {
   it('normalizes mixed-case owner and repo names', () => {
@@ -79,5 +80,74 @@ describe('fetchTcReadyRepos', () => {
     expect(axios.get).toHaveBeenCalledTimes(1);
     expect(tcReadyRepos.has('altowner/validrepo')).toBe(true);
     expect(tcReadyRepos.has('/')).toBe(false);
+  });
+});
+
+describe('getDefaultBibleLayout', () => {
+  it('builds the 5-resource default layout when literal/simplified/tn/twl/ta exist', () => {
+    const resourcesApp = [
+      {
+        languageId: 'en',
+        owner: 'unfoldingword',
+        name: 'en_ult',
+      },
+      {
+        languageId: 'en',
+        owner: 'unfoldingword',
+        name: 'en_ust',
+      },
+      {
+        languageId: 'en',
+        owner: 'unfoldingword',
+        name: 'en_tn',
+      },
+      {
+        languageId: 'en',
+        owner: 'unfoldingword',
+        name: 'en_twl',
+      },
+      {
+        languageId: 'en',
+        owner: 'unfoldingword',
+        name: 'en_ta',
+      },
+    ];
+
+    const layout = getDefaultBibleLayout('en', resourcesApp);
+    const ids = layout.lg.map((item) => item.i);
+
+    expect(ids).toEqual([
+      'unfoldingword__en_ult',
+      'unfoldingword__en_ust',
+      'unfoldingword__en_twl',
+      'unfoldingword__en_tn',
+      'unfoldingword__en_ta',
+    ]);
+
+    expect(layout.lg[0]).toMatchObject({ w: 4, h: 12, x: 0, y: 0 });
+    expect(layout.lg[1]).toMatchObject({ w: 4, h: 6, x: 4, y: 0 });
+    expect(layout.lg[2]).toMatchObject({ w: 4, h: 6, x: 4, y: 6 });
+    expect(layout.lg[3]).toMatchObject({ w: 4, h: 6, x: 8, y: 0 });
+    expect(layout.lg[4]).toMatchObject({ w: 4, h: 6, x: 8, y: 6 });
+    expect(layout.md).toHaveLength(5);
+    expect(layout.sm).toHaveLength(5);
+  });
+
+  it('uses defaultTplBible fallback when required resources are missing', () => {
+    const resourcesApp = [
+      {
+        languageId: 'en',
+        owner: 'unfoldingword',
+        name: 'en_ult',
+      },
+      {
+        languageId: 'en',
+        owner: 'unfoldingword',
+        name: 'en_ust',
+      },
+    ];
+
+    const layout = getDefaultBibleLayout('en', resourcesApp);
+    expect(layout).toEqual(defaultTplBible.en);
   });
 });

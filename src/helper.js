@@ -53,6 +53,90 @@ export const getRepoSlug = (owner, name) => {
     .toLowerCase()}`;
 };
 
+const getResourceType = (resourceName = '') => {
+  const normalizedName = resourceName.toLowerCase();
+
+  if (normalizedName.endsWith('_ult') || normalizedName.endsWith('_glt'))
+    return 'literal';
+  if (normalizedName.endsWith('_ust') || normalizedName.endsWith('_gst'))
+    return 'simplified';
+  if (normalizedName.endsWith('_tn')) return 'tn';
+  if (normalizedName.endsWith('_twl')) return 'twl';
+  if (normalizedName.endsWith('_ta')) return 'ta';
+
+  return null;
+};
+
+const generateMdLayout = (lgLayout) => {
+  const resources = lgLayout.map((item) => item.i.split('__').join('/'));
+  const mdHeight = Math.ceil(12 / Math.ceil(resources.length / 2));
+
+  return resources.map((el, index) => ({
+    w: 3,
+    h: mdHeight,
+    x: (index * 3) % 6,
+    y: Math.floor(index / 2) * mdHeight,
+    i: el.split('/').join('__'),
+    minW: 1,
+    minH: 3,
+  }));
+};
+
+const generateSmLayout = (lgLayout) => {
+  const resources = lgLayout.map((item) => item.i.split('__').join('/'));
+
+  return resources.map((el, index) => ({
+    w: 1,
+    h: resources.length === 1 ? 8 : 4,
+    x: 0,
+    y: index * 4,
+    i: el.split('/').join('__'),
+    minH: 3,
+    minW: 1,
+  }));
+};
+
+export const getDefaultBibleLayout = (currentLanguage, resourcesApp = []) => {
+  const requiredTypes = ['literal', 'simplified', 'tn', 'twl', 'ta'];
+  const resourcesByType = {};
+
+  resourcesApp.forEach((resource) => {
+    if (!resource || resource.languageId !== currentLanguage) {
+      return;
+    }
+
+    const type = getResourceType(resource.name);
+    if (!type || resourcesByType[type]) {
+      return;
+    }
+
+    resourcesByType[type] = {
+      i: `${resource.owner}__${resource.name}`,
+      minH: 3,
+      minW: 1,
+    };
+  });
+
+  const hasAllResources = requiredTypes.every((type) => !!resourcesByType[type]);
+  if (!hasAllResources) {
+    return defaultTplBible[currentLanguage];
+  }
+
+  const lg = [
+    { w: 4, h: 12, x: 0, y: 0, ...resourcesByType.literal },
+    { w: 4, h: 6, x: 4, y: 0, ...resourcesByType.simplified },
+    { w: 4, h: 6, x: 4, y: 6, ...resourcesByType.twl },
+    { w: 4, h: 6, x: 8, y: 0, ...resourcesByType.tn },
+    { w: 4, h: 6, x: 8, y: 6, ...resourcesByType.ta },
+  ];
+
+  return {
+    lg,
+    md: generateMdLayout(lg),
+    sm: generateSmLayout(lg),
+  };
+};
+
 export const fetchTcReadyRepos = async (server) => {
   const repos = [];
   const perPage = 25;
@@ -316,18 +400,18 @@ export const switchModeBible = (type, goToBookChapterVerse, setAppConfig) => {
 };
 
 const resetMode = (
-  defaultTpl,
+  defaultLayout,
   defaultReference,
   currentLanguage,
   setAppConfig,
   setLanguageResources,
   goToBookChapterVerse
 ) => {
-  setAppConfig(defaultTpl[currentLanguage]);
+  setAppConfig(defaultLayout);
 
   setLanguageResources((prev) => {
     const new_val = cloneDeep(prev);
-    defaultTpl[currentLanguage].lg.forEach((el) => {
+    defaultLayout.lg.forEach((el) => {
       if (
         !!el.i.split('__')[1]?.split('_')[0] &&
         !new_val.includes(el.i.split('__')[1]?.split('_')[0])
@@ -365,6 +449,16 @@ export const resetWorkspace = ({
   resetAll,
 }) => {
   const workspaceType = resetAll ? 'all' : bookId === 'obs' ? 'obs' : 'bible';
+  let resourcesApp = [];
+  try {
+    const resourcesAppStr = localStorage.getItem('resourcesApp');
+    resourcesApp = resourcesAppStr ? JSON.parse(resourcesAppStr) : [];
+  } catch (error) {
+    resourcesApp = [];
+  }
+  const defaultBibleLayout = getDefaultBibleLayout(currentLanguage, resourcesApp);
+  const defaultObsLayout = defaultTplOBS[currentLanguage];
+
   let oldAppConfig = null;
   try {
     const appConfigStr = localStorage.getItem('appConfig');
@@ -376,11 +470,11 @@ export const resetWorkspace = ({
     case 'bible':
       const bibleAppConfig = {
         ...(oldAppConfig || {}),
-        [workspaceType]: defaultTplBible[currentLanguage],
+        [workspaceType]: defaultBibleLayout,
       };
       localStorage.setItem('appConfig', JSON.stringify(bibleAppConfig));
       resetMode(
-        defaultTplBible,
+        defaultBibleLayout,
         defaultBibleReference,
         currentLanguage,
         setAppConfig,
@@ -392,11 +486,11 @@ export const resetWorkspace = ({
     case 'obs':
       const obsAppConfig = {
         ...(oldAppConfig || {}),
-        [workspaceType]: defaultTplOBS[currentLanguage],
+        [workspaceType]: defaultObsLayout,
       };
       localStorage.setItem('appConfig', JSON.stringify(obsAppConfig));
       resetMode(
-        defaultTplOBS,
+        defaultObsLayout,
         defaultOBSReference,
         currentLanguage,
         setAppConfig,
@@ -406,13 +500,13 @@ export const resetWorkspace = ({
       break;
     case 'all':
       const allAppConfig = {
-        obs: defaultTplOBS[currentLanguage],
-        bible: defaultTplBible[currentLanguage],
+        obs: defaultObsLayout,
+        bible: defaultBibleLayout,
       };
       localStorage.setItem('appConfig', JSON.stringify(allAppConfig));
       bookId === 'obs'
         ? resetMode(
-            defaultTplOBS,
+            defaultObsLayout,
             defaultOBSReference,
             currentLanguage,
             setAppConfig,
@@ -420,7 +514,7 @@ export const resetWorkspace = ({
             goToBookChapterVerse
           )
         : resetMode(
-            defaultTplBible,
+            defaultBibleLayout,
             defaultBibleReference,
             currentLanguage,
             setAppConfig,

@@ -8,20 +8,21 @@ import { useTranslation } from 'react-i18next';
 
 import { ReferenceContext } from '../context';
 
-import { getResources, getBookList, checkLSVal, getLayoutType } from '../helper';
 import {
-  defaultTplBible,
-  defaultTplOBS,
-  languages,
-  bibleList,
-  server,
-} from '../config/base';
+  getResources,
+  getBookList,
+  checkLSVal,
+  getLayoutType,
+  getDefaultBibleLayout,
+} from '../helper';
+import { defaultTplOBS, languages, bibleList, server } from '../config/base';
 
 export const AppContext = React.createContext();
 
 const _currentLanguage = checkLSVal('i18nextLng', languages[0]);
 const _fontSize = parseInt(localStorage.getItem('fontSize'));
 const _layoutStorage = localStorage.getItem('layoutStorage');
+const _resourcesApp = checkLSVal('resourcesApp', [], 'object');
 export function AppContextProvider({ children }) {
   const {
     state: { referenceSelected },
@@ -37,7 +38,7 @@ export function AppContextProvider({ children }) {
       checkLSVal(
         'appConfig',
         {
-          bible: defaultTplBible[_currentLanguage],
+          bible: getDefaultBibleLayout(_currentLanguage, _resourcesApp),
           obs: defaultTplOBS[_currentLanguage],
         },
         'object',
@@ -73,7 +74,7 @@ export function AppContextProvider({ children }) {
    * 3. Maybe make availableBookList in ResourceContext
    */
   const [resourcesApp, setResourcesApp] = useState(() => {
-    return checkLSVal('resourcesApp', [], 'object');
+    return _resourcesApp;
   });
 
   const _resourceLinks = getResources(appConfig, resourcesApp);
