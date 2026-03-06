@@ -7,7 +7,6 @@ jest.mock('axios', () => ({
 
 import axios from 'axios';
 
-import { defaultTplBible } from './config/base';
 import { fetchTcReadyRepos, getRepoSlug, getDefaultBibleLayout } from './helper';
 
 describe('getRepoSlug', () => {
@@ -133,7 +132,7 @@ describe('getDefaultBibleLayout', () => {
     expect(layout.sm).toHaveLength(5);
   });
 
-  it('uses defaultTplBible fallback when required resources are missing', () => {
+  it('uses available core resources when some default resources are missing', () => {
     const resourcesApp = [
       {
         languageId: 'en',
@@ -148,6 +147,45 @@ describe('getDefaultBibleLayout', () => {
     ];
 
     const layout = getDefaultBibleLayout('en', resourcesApp);
-    expect(layout).toEqual(defaultTplBible.en);
+    expect(layout.lg).toEqual([
+      expect.objectContaining({
+        i: 'unfoldingword__en_ult',
+        w: 4,
+        h: 12,
+        x: 0,
+        y: 0,
+      }),
+      expect.objectContaining({
+        i: 'unfoldingword__en_ust',
+        w: 4,
+        h: 12,
+        x: 4,
+        y: 0,
+      }),
+    ]);
+    expect(layout.md).toHaveLength(2);
+    expect(layout.sm).toHaveLength(2);
+  });
+
+  it('prefers unfoldingword resources over lower-priority owners', () => {
+    const resourcesApp = [
+      {
+        languageId: 'en',
+        owner: 'door43-catalog',
+        name: 'en_twl',
+      },
+      {
+        languageId: 'en',
+        owner: 'unfoldingword',
+        name: 'en_twl',
+      },
+    ];
+
+    const layout = getDefaultBibleLayout('en', resourcesApp);
+    expect(layout.lg).toEqual([
+      expect.objectContaining({
+        i: 'unfoldingword__en_twl',
+      }),
+    ]);
   });
 });

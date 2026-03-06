@@ -97,7 +97,13 @@ const generateSmLayout = (lgLayout) => {
 };
 
 export const getDefaultBibleLayout = (currentLanguage, resourcesApp = []) => {
-  const requiredTypes = ['literal', 'simplified', 'tn', 'twl', 'ta'];
+  const targetTypes = ['literal', 'simplified', 'tn', 'twl', 'ta'];
+  const preferredOwners = ['unfoldingword', 'door43-catalog'];
+  const getOwnerPriority = (owner = '') => {
+    const normalizedOwner = owner.toLowerCase();
+    const index = preferredOwners.indexOf(normalizedOwner);
+    return index === -1 ? Number.MAX_SAFE_INTEGER : index;
+  };
   const resourcesByType = {};
 
   resourcesApp.forEach((resource) => {
@@ -106,29 +112,64 @@ export const getDefaultBibleLayout = (currentLanguage, resourcesApp = []) => {
     }
 
     const type = getResourceType(resource.name);
-    if (!type || resourcesByType[type]) {
+    if (!type) {
       return;
     }
 
-    resourcesByType[type] = {
+    const nextResource = {
       i: `${resource.owner}__${resource.name}`,
+      priority: getOwnerPriority(resource.owner),
       minH: 3,
       minW: 1,
     };
+    const currentResource = resourcesByType[type];
+    if (!currentResource) {
+      resourcesByType[type] = nextResource;
+      return;
+    }
+
+    if (nextResource.priority < currentResource.priority) {
+      resourcesByType[type] = nextResource;
+    }
   });
 
-  const hasAllResources = requiredTypes.every((type) => !!resourcesByType[type]);
-  if (!hasAllResources) {
+  const hasAnyResource = targetTypes.some((type) => !!resourcesByType[type]);
+  if (!hasAnyResource) {
     return defaultTplBible[currentLanguage];
   }
 
-  const lg = [
-    { w: 4, h: 12, x: 0, y: 0, ...resourcesByType.literal },
-    { w: 4, h: 6, x: 4, y: 0, ...resourcesByType.simplified },
-    { w: 4, h: 6, x: 4, y: 6, ...resourcesByType.twl },
-    { w: 4, h: 6, x: 8, y: 0, ...resourcesByType.tn },
-    { w: 4, h: 6, x: 8, y: 6, ...resourcesByType.ta },
-  ];
+  const groups = [];
+  if (resourcesByType.literal) {
+    groups.push([{ w: 4, h: 12, y: 0, ...resourcesByType.literal }]);
+  }
+  if (resourcesByType.simplified || resourcesByType.twl) {
+    if (resourcesByType.simplified && resourcesByType.twl) {
+      groups.push([
+        { w: 4, h: 6, y: 0, ...resourcesByType.simplified },
+        { w: 4, h: 6, y: 6, ...resourcesByType.twl },
+      ]);
+    } else if (resourcesByType.simplified) {
+      groups.push([{ w: 4, h: 12, y: 0, ...resourcesByType.simplified }]);
+    } else {
+      groups.push([{ w: 4, h: 12, y: 0, ...resourcesByType.twl }]);
+    }
+  }
+  if (resourcesByType.tn || resourcesByType.ta) {
+    if (resourcesByType.tn && resourcesByType.ta) {
+      groups.push([
+        { w: 4, h: 6, y: 0, ...resourcesByType.tn },
+        { w: 4, h: 6, y: 6, ...resourcesByType.ta },
+      ]);
+    } else if (resourcesByType.tn) {
+      groups.push([{ w: 4, h: 12, y: 0, ...resourcesByType.tn }]);
+    } else {
+      groups.push([{ w: 4, h: 12, y: 0, ...resourcesByType.ta }]);
+    }
+  }
+
+  const lg = groups.flatMap((group, groupIndex) =>
+    group.map(({ priority, ...card }) => ({ ...card, x: groupIndex * 4 }))
+  );
 
   return {
     lg,
@@ -446,15 +487,18 @@ export const resetWorkspace = ({
   setLanguageResources,
   goToBookChapterVerse,
   currentLanguage,
+  resourcesApp: resourcesAppFromState,
   resetAll,
 }) => {
   const workspaceType = resetAll ? 'all' : bookId === 'obs' ? 'obs' : 'bible';
-  let resourcesApp = [];
-  try {
-    const resourcesAppStr = localStorage.getItem('resourcesApp');
-    resourcesApp = resourcesAppStr ? JSON.parse(resourcesAppStr) : [];
-  } catch (error) {
-    resourcesApp = [];
+  let resourcesApp = Array.isArray(resourcesAppFromState) ? resourcesAppFromState : [];
+  if (!resourcesApp.length) {
+    try {
+      const resourcesAppStr = localStorage.getItem('resourcesApp');
+      resourcesApp = resourcesAppStr ? JSON.parse(resourcesAppStr) : [];
+    } catch (error) {
+      resourcesApp = [];
+    }
   }
   const defaultBibleLayout = getDefaultBibleLayout(currentLanguage, resourcesApp);
   const defaultObsLayout = defaultTplOBS[currentLanguage];

@@ -42,6 +42,18 @@ function SearchResources({ anchorEl, onClose, open }) {
   const { enqueueSnackbar } = useSnackbar();
   const hasSelectedLanguage = (languageId) =>
     languageResources.some((lang) => lang === languageId);
+  const isCoreDefaultResource = (resourceName = '') => {
+    const normalizedName = resourceName.toLowerCase();
+    return (
+      normalizedName.endsWith('_ult') ||
+      normalizedName.endsWith('_glt') ||
+      normalizedName.endsWith('_ust') ||
+      normalizedName.endsWith('_gst') ||
+      normalizedName.endsWith('_tn') ||
+      normalizedName.endsWith('_twl') ||
+      normalizedName.endsWith('_ta')
+    );
+  };
 
   const handleAddMaterial = (item) => {
     setAppConfig((prev) => {
@@ -113,7 +125,8 @@ function SearchResources({ anchorEl, onClose, open }) {
           })
           .filter(
             (el) =>
-              tcReadyRepos.has(getRepoSlug(el.owner, el.name)) &&
+              (tcReadyRepos.has(getRepoSlug(el.owner, el.name)) ||
+                isCoreDefaultResource(el.name)) &&
               hasSelectedLanguage(el.languageId)
           );
         setResourcesApp((prev) => {
