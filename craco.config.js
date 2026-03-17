@@ -1,4 +1,4 @@
-const path = require('path');
+const webpack = require('webpack');
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 
 module.exports = {
@@ -16,8 +16,17 @@ module.exports = {
           ...(webpackConfig.resolve?.fallback || {}),
           buffer: require.resolve('buffer/'),
           path: require.resolve('path-browserify'),
+          process: require.resolve('process/browser.js'),
         },
       };
+
+      webpackConfig.plugins = [
+        ...(webpackConfig.plugins || []),
+        new webpack.ProvidePlugin({
+          process: require.resolve('process/browser.js'),
+          Buffer: ['buffer', 'Buffer'],
+        }),
+      ];
 
       // Keep existing optimization config
       webpackConfig.optimization = {
@@ -51,7 +60,7 @@ module.exports = {
         },
       };
 
-      webpackConfig.plugins = (webpackConfig.plugins || []).map((plugin) => {
+      webpackConfig.plugins = webpackConfig.plugins.map((plugin) => {
         if (plugin instanceof WorkboxWebpackPlugin.InjectManifest) {
           return new WorkboxWebpackPlugin.InjectManifest({
             ...plugin.config,
