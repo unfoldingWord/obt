@@ -49,6 +49,14 @@ module.exports = {
         },
       };
 
+      webpackConfig.plugins = (webpackConfig.plugins || []).map((plugin) => {
+        if (plugin?.constructor?.name === 'GenerateSW' && plugin.config) {
+          plugin.config.maximumFileSizeToCacheInBytes = 15 * 1024 * 1024;
+        }
+
+        return plugin;
+      });
+
       return webpackConfig;
     },
   },
