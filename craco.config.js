@@ -1,6 +1,4 @@
 const path = require('path');
-const cracoBabelLoader = require('craco-babel-loader');
-
 module.exports = {
   babel: {
     plugins: [
@@ -8,16 +6,6 @@ module.exports = {
       '@babel/plugin-transform-nullish-coalescing-operator',
     ],
   },
-  plugins: [
-    {
-      plugin: cracoBabelLoader,
-      options: {
-        includes: [
-          path.resolve(__dirname, 'node_modules/@mui'),
-        ],
-      },
-    },
-  ],
   webpack: {
     configure: (webpackConfig) => {
       webpackConfig.resolve = {
