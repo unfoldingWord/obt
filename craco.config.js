@@ -1,5 +1,5 @@
-const path = require('path');
-const cracoBabelLoader = require('craco-babel-loader');
+const webpack = require('webpack');
+const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 
 module.exports = {
   babel: {
@@ -8,16 +8,6 @@ module.exports = {
       '@babel/plugin-transform-nullish-coalescing-operator',
     ],
   },
-  plugins: [
-    {
-      plugin: cracoBabelLoader,
-      options: {
-        includes: [
-          path.resolve(__dirname, 'node_modules/@mui'),
-        ],
-      },
-    },
-  ],
   webpack: {
     configure: (webpackConfig) => {
       webpackConfig.resolve = {
@@ -26,8 +16,17 @@ module.exports = {
           ...(webpackConfig.resolve?.fallback || {}),
           buffer: require.resolve('buffer/'),
           path: require.resolve('path-browserify'),
+          process: require.resolve('process/browser.js'),
         },
       };
+
+      webpackConfig.plugins = [
+        ...(webpackConfig.plugins || []),
+        new webpack.ProvidePlugin({
+          process: require.resolve('process/browser.js'),
+          Buffer: ['buffer', 'Buffer'],
+        }),
+      ];
 
       // Keep existing optimization config
       webpackConfig.optimization = {
@@ -60,6 +59,24 @@ module.exports = {
           name: 'manifest',
         },
       };
+
+      webpackConfig.plugins = webpackConfig.plugins.map((plugin) => {
+        if (plugin instanceof WorkboxWebpackPlugin.InjectManifest) {
+          return new WorkboxWebpackPlugin.InjectManifest({
+            ...plugin.config,
+            maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+          });
+        }
+
+        if (plugin instanceof WorkboxWebpackPlugin.GenerateSW) {
+          return new WorkboxWebpackPlugin.GenerateSW({
+            ...plugin.config,
+            maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+          });
+        }
+
+        return plugin;
+      });
 
       return webpackConfig;
     },
