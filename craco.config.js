@@ -1,4 +1,6 @@
 const path = require('path');
+const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
+
 module.exports = {
   babel: {
     plugins: [
@@ -50,8 +52,11 @@ module.exports = {
       };
 
       webpackConfig.plugins = (webpackConfig.plugins || []).map((plugin) => {
-        if (plugin?.constructor?.name === 'GenerateSW' && plugin.config) {
-          plugin.config.maximumFileSizeToCacheInBytes = 15 * 1024 * 1024;
+        if (plugin instanceof WorkboxWebpackPlugin.GenerateSW) {
+          return new WorkboxWebpackPlugin.GenerateSW({
+            ...plugin.config,
+            maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+          });
         }
 
         return plugin;
