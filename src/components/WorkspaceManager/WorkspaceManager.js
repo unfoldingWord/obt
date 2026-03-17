@@ -9,7 +9,7 @@ import { resetWorkspace } from '../../helper';
 
 function WorkspaceManager({ onClose }) {
   const {
-    state: { currentLanguage },
+    state: { currentLanguage, resourcesApp },
     actions: { setAppConfig, setLanguageResources },
   } = useContext(AppContext);
 
@@ -29,6 +29,7 @@ function WorkspaceManager({ onClose }) {
       setLanguageResources,
       goToBookChapterVerse,
       currentLanguage,
+      resourcesApp,
       resetAll: false,
     });
 
