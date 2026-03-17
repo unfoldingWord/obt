@@ -52,6 +52,13 @@ module.exports = {
       };
 
       webpackConfig.plugins = (webpackConfig.plugins || []).map((plugin) => {
+        if (plugin instanceof WorkboxWebpackPlugin.InjectManifest) {
+          return new WorkboxWebpackPlugin.InjectManifest({
+            ...plugin.config,
+            maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+          });
+        }
+
         if (plugin instanceof WorkboxWebpackPlugin.GenerateSW) {
           return new WorkboxWebpackPlugin.GenerateSW({
             ...plugin.config,
