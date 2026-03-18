@@ -20,9 +20,7 @@ function StartDialog() {
   } = useContext(AppContext);
 
   const {
-    state: {
-      referenceSelected,
-    },
+    state: { referenceSelected },
     actions: { goToBookChapterVerse },
   } = useContext(ReferenceContext);
 
