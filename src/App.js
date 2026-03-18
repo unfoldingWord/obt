@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { ThemeProvider as V4ThemeProvider } from '@material-ui/core/styles';
@@ -27,6 +27,22 @@ export default function App() {
   const {
     state: { theme },
   } = useContext(AppContext);
+
+  useEffect(() => {
+    const bootLoader = document.getElementById('app-boot-loader');
+    if (!bootLoader) {
+      return undefined;
+    }
+
+    bootLoader.classList.add('app-boot-loader--hidden');
+    const removeTimer = window.setTimeout(() => {
+      bootLoader.remove();
+    }, 200);
+
+    return () => {
+      window.clearTimeout(removeTimer);
+    };
+  }, []);
 
   Shortcut();
   Swipes();

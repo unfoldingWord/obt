@@ -1,5 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 
+import { Box, CircularProgress } from '@mui/material';
 import { Card as TranslationCard } from 'translation-helps-rcl';
 import { useTranslation } from 'react-i18next';
 
@@ -25,7 +26,13 @@ function Card({ type, onClose, classes }) {
   const { t } = useTranslation();
   let CurrentCard;
   const {
-    state: { resourcesApp, fontSize, switchExtraTitleCard, switchMasterOnly },
+    state: {
+      resourcesApp,
+      fontSize,
+      switchExtraTitleCard,
+      switchMasterOnly,
+      initialResourcesLoading,
+    },
   } = useContext(AppContext);
 
   const {
@@ -48,8 +55,7 @@ function Card({ type, onClose, classes }) {
     [resource.languageId, resource.owner, switchExtraTitleCard]
   );
 
-  if (!resource && resourcesApp.length > 0) {
-    // Empty Card
+  if (!resource) {
     return (
       <TranslationCard
         closeable
@@ -58,7 +64,21 @@ function Card({ type, onClose, classes }) {
         id={type}
         fontSize={fontSize}
       >
-        <h1>{t('Problem_loading')}</h1>
+        <Box
+          sx={{
+            minHeight: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 2,
+          }}
+        >
+          {initialResourcesLoading ? (
+            <CircularProgress color="primary" size={72} />
+          ) : (
+            <h1>{t('Problem_loading')}</h1>
+          )}
+        </Box>
       </TranslationCard>
     );
   }
