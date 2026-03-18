@@ -15,6 +15,7 @@ import {
   getLayoutType,
   getDefaultBibleLayout,
 } from '../helper';
+import { subjects } from '../config/materials';
 import {
   defaultTplBible,
   defaultTplOBS,
@@ -22,13 +23,21 @@ import {
   bibleList,
   server,
 } from '../config/base';
+import { loadCatalogResources } from '../resourceCatalog';
+import {
+  getValidBootstrapResourcesFromCache,
+  loadBootstrapResources,
+} from '../resourceBootstrap';
 
 export const AppContext = React.createContext();
 
 const _currentLanguage = checkLSVal('i18nextLng', languages[0]);
 const _fontSize = parseInt(localStorage.getItem('fontSize'));
 const _layoutStorage = localStorage.getItem('layoutStorage');
-const _resourcesApp = checkLSVal('resourcesApp', [], 'object');
+
+const getInitialResourcesApp = () => {
+  return getValidBootstrapResourcesFromCache() || [];
+};
 
 const getLayoutSignature = (layout = {}) => {
   return ['lg', 'md', 'sm']
@@ -56,7 +65,7 @@ export function AppContextProvider({ children }) {
       checkLSVal(
         'appConfig',
         {
-          bible: getDefaultBibleLayout(_currentLanguage, _resourcesApp),
+          bible: getDefaultBibleLayout(_currentLanguage, getInitialResourcesApp()),
           obs: defaultTplOBS[_currentLanguage],
         },
         'object',
@@ -92,11 +101,12 @@ export function AppContextProvider({ children }) {
    * 3. Maybe make availableBookList in ResourceContext
    */
   const [resourcesApp, setResourcesApp] = useState(() => {
-    return _resourcesApp;
+    return getInitialResourcesApp();
   });
   const [initialResourcesLoading, setInitialResourcesLoading] = useState(
-    () => _resourcesApp.length === 0
+    () => getInitialResourcesApp().length === 0
   );
+  const [bootstrapResolving, setBootstrapResolving] = useState(false);
 
   const _resourceLinks = getResources(appConfig, resourcesApp);
   const [resourceLinks, setResourceLinks] = useState(_resourceLinks);
@@ -239,6 +249,52 @@ export function AppContextProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('startDialog', openStartDialog);
   }, [openStartDialog]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const isEnglishBibleBootstrap =
+      referenceSelected.bookId !== 'obs' &&
+      currentLanguage === 'en' &&
+      languageResources.length === 1 &&
+      languageResources[0] === 'en';
+    const cachedBootstrapResources = isEnglishBibleBootstrap
+      ? getValidBootstrapResourcesFromCache()
+      : null;
+
+    const loadInitialResources = async () => {
+      setBootstrapResolving(true);
+      setInitialResourcesLoading(!cachedBootstrapResources?.length);
+
+      try {
+        const nextResources = isEnglishBibleBootstrap
+          ? await loadBootstrapResources({ server })
+          : await loadCatalogResources(server, languageResources, subjects);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setResourcesApp(nextResources);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        if (!isMounted) {
+          return;
+        }
+
+        setBootstrapResolving(false);
+        setInitialResourcesLoading(false);
+      }
+    };
+
+    loadInitialResources();
+
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLanguage, languageResources, referenceSelected.bookId === 'obs']);
+
   const [quote, setQuote] = useState('');
   const [occurrence, setOccurrence] = useState(0);
   const [selections, setSelections] = useState([{}]);
@@ -258,6 +314,7 @@ export function AppContextProvider({ children }) {
       resourcesApp,
       resources,
       initialResourcesLoading,
+      bootstrapResolving,
       _resourceLinks,
       showBookSelect,
       showChapterSelect,

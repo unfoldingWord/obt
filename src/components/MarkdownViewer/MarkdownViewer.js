@@ -8,23 +8,28 @@ import useStyles from './style';
 import { fixUrl } from '../../helper';
 
 function MarkdownViewer({ children, config, fontSize }) {
-  const { server, owner, languageId, projectId } = config;
+  const { server, owner, languageId, projectId, ref, listRef } = config || {};
   const classes = useStyles();
   const {
     actions: { goToBookChapterVerse },
   } = useContext(ReferenceContext);
+  const resourceRef = ref ?? listRef;
   const transformLinkUri = (uri) => {
     return changeUri({
       uri,
       server,
       owner,
       languageId,
+      resourceRef,
     });
   };
 
   const content = typeof children === 'string' ? fixUrl(children) : '';
-  const changeUri = ({ uri, server, owner, languageId }) => {
+  const changeUri = ({ uri, server, owner, languageId, resourceRef }) => {
     if (!uri) {
+      return;
+    }
+    if (!resourceRef) {
       return;
     }
 
@@ -32,17 +37,19 @@ function MarkdownViewer({ children, config, fontSize }) {
     const tw = ['/other/', '/kt/', '/names/'];
     let url = '';
     const reference = _link.split('/');
+    const rawRefPath =
+      resourceRef === 'master' ? `raw/branch/${resourceRef}` : `raw/tag/${resourceRef}`;
     if (tw.find((item) => _link.includes(item)) && reference) {
       const resourceId = 'tw';
       let filePath = '';
       switch (reference.length) {
         case 3:
           filePath = `${reference[1]}/${reference[2]}`;
-          url = `#page=${server}/${owner}/${languageId}_${resourceId}/raw/branch/master/bible/${filePath}`;
+          url = `#page=${server}/${owner}/${languageId}_${resourceId}/${rawRefPath}/bible/${filePath}`;
           break;
         case 6:
           filePath = `${reference[4]}/${reference[5]}`;
-          url = `#page=${server}/${owner}/${languageId}_${resourceId}/raw/branch/master/bible/${filePath}.md`;
+          url = `#page=${server}/${owner}/${languageId}_${resourceId}/${rawRefPath}/bible/${filePath}.md`;
           break;
         default:
           break;
@@ -52,7 +59,7 @@ function MarkdownViewer({ children, config, fontSize }) {
     if (_link.includes('/ta/man/')) {
       const resourceId = 'ta';
       const filePath = `${reference[3]}/${reference[4]}`;
-      url = `#page=${server}/${owner}/${languageId}_${resourceId}/raw/branch/master/${filePath}/01.md`;
+      url = `#page=${server}/${owner}/${languageId}_${resourceId}/${rawRefPath}/${filePath}/01.md`;
       return url;
     }
     if (_link.includes('/help/')) {

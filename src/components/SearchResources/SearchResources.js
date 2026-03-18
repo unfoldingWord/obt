@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 
-import axios from 'axios';
 import { MenuItem, Menu, Button, Box, useTheme } from '@mui/material';
 import { getXY } from 'resource-workspace-rcl';
 import { useSnackbar } from 'notistack';
@@ -11,19 +10,15 @@ import { SelectResourcesLanguages, DialogUI, FeedbackDialog } from '../../compon
 
 import { subjects, bibleSubjects, obsSubjects, langNames } from '../../config/materials';
 import { defaultCard, server, columns } from '../../config/base';
-import {
-  fetchTcReadyRepos,
-  getRepoSlug,
-  getUniqueResources,
-  packageLangs,
-} from '../../helper';
+import { getUniqueResources, packageLangs } from '../../helper';
+import { filterResourcesByLanguage, loadCatalogResources } from '../../resourceCatalog';
 
 import LanguageIcon from '@mui/icons-material/Language';
 
 function SearchResources({ anchorEl, onClose, open }) {
   const {
-    state: { appConfig, resourcesApp, languageResources, initialResourcesLoading },
-    actions: { setAppConfig, setResourcesApp, setInitialResourcesLoading },
+    state: { appConfig, resourcesApp, languageResources },
+    actions: { setAppConfig, setResourcesApp },
   } = useContext(AppContext);
 
   const {
@@ -40,20 +35,6 @@ function SearchResources({ anchorEl, onClose, open }) {
   const prevResources = useRef([]);
   const uniqueResources = getUniqueResources(appConfig, resourcesApp);
   const { enqueueSnackbar } = useSnackbar();
-  const hasSelectedLanguage = (languageId) =>
-    languageResources.some((lang) => lang === languageId);
-  const isCoreDefaultResource = (resourceName = '') => {
-    const normalizedName = resourceName.toLowerCase();
-    return (
-      normalizedName.endsWith('_ult') ||
-      normalizedName.endsWith('_glt') ||
-      normalizedName.endsWith('_ust') ||
-      normalizedName.endsWith('_gst') ||
-      normalizedName.endsWith('_tn') ||
-      normalizedName.endsWith('_twl') ||
-      normalizedName.endsWith('_ta')
-    );
-  };
 
   const handleAddMaterial = (item) => {
     setAppConfig((prev) => {
@@ -101,35 +82,17 @@ function SearchResources({ anchorEl, onClose, open }) {
   };
 
   useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    let isMounted = true;
     const fetchResources = async () => {
-      const isInitialLoad = initialResourcesLoading;
       try {
-        const tcReadyRepos = await fetchTcReadyRepos(server);
-        const res = await axios.get(
-          server +
-            '/api/v1/catalog/search?limit=1000&sort=lang,title' +
-            '&subject=' +
-            subjects.join(',')
-        );
-        const result = res.data.data
-          .map((el) => {
-            return {
-              id: el.id,
-              languageId: el.language.toLowerCase(),
-              name: el.name,
-              subject: el.subject,
-              title: el.title,
-              ref: el.branch_or_tag_name,
-              owner: el.owner.toString().toLowerCase(),
-              link: el.full_name + '/' + el.branch_or_tag_name,
-            };
-          })
-          .filter(
-            (el) =>
-              (tcReadyRepos.has(getRepoSlug(el.owner, el.name)) ||
-                isCoreDefaultResource(el.name)) &&
-              hasSelectedLanguage(el.languageId)
-          );
+        const result = await loadCatalogResources(server, languageResources, subjects);
+        if (!isMounted) {
+          return;
+        }
         setResourcesApp((prev) => {
           if (prev && result) {
             prevResources.current = prev;
@@ -139,20 +102,18 @@ function SearchResources({ anchorEl, onClose, open }) {
       } catch (err) {
         console.log(err);
         setResourcesApp((prev) =>
-          (prev || []).filter((resource) => hasSelectedLanguage(resource.languageId))
+          filterResourcesByLanguage(prev || [], languageResources)
         );
         enqueueSnackbar(t('No_resources_found'), { variant: 'warning' });
-      } finally {
-        if (isInitialLoad) {
-          setInitialResourcesLoading(false);
-        }
       }
     };
 
     fetchResources();
-    return () => {};
+    return () => {
+      isMounted = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [languageResources]);
+  }, [open, languageResources]);
 
   useEffect(() => {
     const newResources = findNewResources(prevResources.current, resourcesApp);

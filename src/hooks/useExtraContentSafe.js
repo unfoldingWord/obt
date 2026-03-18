@@ -2,11 +2,9 @@ import { useEffect, useState } from 'react';
 import isEqual from 'deep-equal';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 
-import {
-  addGlQuotesTo,
-  getGlAlignmentBibles,
-  getGlAlignmentBiblesList,
-} from 'translation-helps-rcl/dist/core';
+import { addGlQuotesTo, getGlAlignmentBiblesList } from 'translation-helps-rcl/dist/core';
+
+import { loadGlAlignmentBibles } from '../glAlignment';
 
 const useExtraContentSafe = ({
   verse = 1,
@@ -86,14 +84,13 @@ const useExtraContentSafe = ({
         if (isActive) {
           setProcessedItems(null);
         }
-        glBibles_ = await getGlAlignmentBibles(
-          languageId,
+        glBibles_ = await loadGlAlignmentBibles({
+          owner,
+          glBibleList: glBiblesList_.bibles,
           httpConfig,
           server,
-          owner,
           reference,
-          glBiblesList_.bibles
-        );
+        });
         if (isActive) {
           setGlBibles(glBibles_);
           setGlLoadedProjectId(projectId);

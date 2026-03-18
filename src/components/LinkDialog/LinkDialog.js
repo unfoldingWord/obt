@@ -58,7 +58,7 @@ function LinkDialog() {
     setConfig({
       server: 'https://git.door43.org',
       owner: configItems[3] ?? 'door43-catalog',
-      ref: configItems[7] ?? 'master',
+      ref: configItems[7] || undefined,
       languageId: configItems[4].split('_')[0] ?? 'ru',
     });
   }, [dialogLink]);

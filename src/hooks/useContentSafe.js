@@ -13,7 +13,7 @@ import useExtraContentSafe from './useExtraContentSafe';
 
 const useContentSafe = ({
   listRef = 'master',
-  contentRef = 'master',
+  contentRef = listRef,
   verse = 1,
   owner,
   server,
