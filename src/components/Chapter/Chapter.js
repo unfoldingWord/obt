@@ -3,7 +3,7 @@ import React from 'react';
 import { Card } from 'translation-helps-rcl';
 
 import USFMContent from './USFMContent';
-import useContentSafe from '../../hooks/useContentSafe';
+import useChapterContent from '../../hooks/useChapterContent';
 
 export default function Chapter({
   title,
@@ -13,17 +13,10 @@ export default function Chapter({
   type,
   reference,
   fontSize,
-  server,
 }) {
-  const { bookId, chapter } = reference;
-  const content = useContentSafe({
-    chapter: chapter,
-    projectId: bookId,
-    listRef: resource.ref,
-    languageId: resource.languageId,
-    resourceId: resource.name.split('_')[1],
-    owner: resource.owner,
-    server,
+  const content = useChapterContent({
+    reference,
+    resource,
   });
   return (
     <Card

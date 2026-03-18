@@ -34,6 +34,7 @@ function USFMContent({ reference, content, type, fontSize }) {
   const classesNoContent = useNoContentStyles();
   const resource = content.resource;
   const resourceLink = resource?.resourceLink;
+  const chapterData = content.chapterData;
   const { contentNotFoundError, error, loading } = content.resourceStatus;
 
   const {
@@ -58,27 +59,8 @@ function USFMContent({ reference, content, type, fontSize }) {
     }
   };
   useEffect(() => {
-    let isMounted = true;
-    if (resource?.project && Object.keys(resource.project).length !== 0) {
-      resource.project
-        .parseUsfm()
-        .then((result) => {
-          if (isMounted) {
-            if (Object.keys(result?.json?.chapters).length > 0) {
-              setChapter(result.json.chapters[reference.chapter]);
-            }
-          }
-        })
-        .catch((error) => console.log(error));
-    } else {
-      setChapter(null);
-    }
-    return () => {
-      // clean up
-      isMounted = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resourceLink, reference.chapter]);
+    setChapter(chapterData);
+  }, [chapterData, resourceLink]);
 
   useEffect(() => {
     if (loading) {
