@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 OpenBibleText is part of the [open components ecosystem](https://opencomponents.io)
 
+## [1.12.0] - 2026-03-18
+
+### Added
+
+- Initial startup loader so first-time loads do not appear frozen while the app boots
+
+### Changed
+
+- Updated `translation-helps-rcl` to `3.6.8`
+- Updated production build configuration to support current package requirements and Netlify deployment
+
+### Fixed
+
+- Default resource layout now opens the intended five-card workspace when no saved layout exists
+- Default and reset layouts now fall back to all available core resources when one or more expected resources are unavailable
+- First-run cancellation no longer leaves users in a blank workspace while resources are still loading
+- Production startup no longer fails because of missing browser polyfills during package initialization
+
 ## [1.11.0] - 2023-05-30
 
 ### Added
