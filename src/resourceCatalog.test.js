@@ -17,8 +17,9 @@ import axios from 'axios';
 
 import { fetchTcReadyRepos } from './helper';
 import {
-  fetchCatalogResources,
+  getCatalogLanguageIds,
   filterResourcesByLanguage,
+  loadCatalogLanguageIds,
   loadCatalogResources,
   resetCatalogResourceLoaderForTests,
 } from './resourceCatalog';
@@ -42,7 +43,7 @@ describe('resourceCatalog', () => {
     ).toEqual([{ languageId: 'en', name: 'en_ult' }]);
   });
 
-  it('returns tc-ready and core resources for selected languages', async () => {
+  it('returns only tc-ready resources for selected languages', async () => {
     fetchTcReadyRepos.mockResolvedValueOnce(new Set(['unfoldingword/en_ult']));
     axios.get.mockResolvedValueOnce({
       data: {
@@ -81,11 +82,7 @@ describe('resourceCatalog', () => {
       },
     });
 
-    const resources = await fetchCatalogResources(
-      'https://git.door43.org',
-      ['en'],
-      ['Bible']
-    );
+    const resources = await loadCatalogResources('https://git.door43.org', ['en'], ['Bible']);
 
     expect(resources).toEqual([
       expect.objectContaining({
@@ -97,7 +94,60 @@ describe('resourceCatalog', () => {
     ]);
   });
 
-  it('deduplicates in-flight catalog loads for the same language selection', async () => {
+  it('collects unique language ids from the filtered catalog', () => {
+    expect(
+      getCatalogLanguageIds([
+        { languageId: 'en', name: 'en_ult' },
+        { languageId: 'fr', name: 'fr_tn' },
+        { languageId: 'en', name: 'en_twl' },
+      ])
+    ).toEqual(['en', 'fr']);
+  });
+
+  it('loads available language ids from tc-ready catalog entries only', async () => {
+    fetchTcReadyRepos.mockResolvedValueOnce(
+      new Set(['unfoldingword/en_ult', 'door43-catalog/fr_tn'])
+    );
+    axios.get.mockResolvedValueOnce({
+      data: {
+        data: [
+          {
+            id: 1,
+            language: 'en',
+            name: 'en_ult',
+            subject: 'Bible',
+            title: 'ULT',
+            branch_or_tag_name: 'v1',
+            owner: 'unfoldingword',
+          },
+          {
+            id: 2,
+            language: 'fr',
+            name: 'fr_tn',
+            subject: 'TSV Translation Notes',
+            title: 'French TN',
+            branch_or_tag_name: 'v1',
+            owner: 'door43-catalog',
+          },
+          {
+            id: 3,
+            language: 'ru',
+            name: 'ru_tn',
+            subject: 'TSV Translation Notes',
+            title: 'Russian TN',
+            branch_or_tag_name: 'v1',
+            owner: 'ru_gt',
+          },
+        ],
+      },
+    });
+
+    await expect(
+      loadCatalogLanguageIds('https://git.door43.org', ['Bible'])
+    ).resolves.toEqual(['en', 'fr']);
+  });
+
+  it('deduplicates in-flight catalog loads across filtered resource and language lookups', async () => {
     let resolveTcReadyRepos;
     fetchTcReadyRepos.mockImplementation(
       () =>
@@ -107,7 +157,7 @@ describe('resourceCatalog', () => {
     );
 
     const firstRequest = loadCatalogResources('https://git.door43.org', ['en'], ['Bible']);
-    const secondRequest = loadCatalogResources('https://git.door43.org', ['en'], ['Bible']);
+    const secondRequest = loadCatalogLanguageIds('https://git.door43.org', ['Bible']);
 
     resolveTcReadyRepos(new Set(['unfoldingword/en_ult']));
     axios.get.mockResolvedValueOnce({
@@ -130,9 +180,7 @@ describe('resourceCatalog', () => {
     await expect(firstRequest).resolves.toEqual([
       expect.objectContaining({ name: 'en_ult' }),
     ]);
-    await expect(secondRequest).resolves.toEqual([
-      expect.objectContaining({ name: 'en_ult' }),
-    ]);
+    await expect(secondRequest).resolves.toEqual(['en']);
     expect(fetchTcReadyRepos).toHaveBeenCalledTimes(1);
     expect(axios.get).toHaveBeenCalledTimes(1);
   });

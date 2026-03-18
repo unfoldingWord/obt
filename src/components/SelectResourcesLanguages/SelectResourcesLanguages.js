@@ -8,7 +8,7 @@ import { AppContext } from '../../context';
 import { langNames } from '../../config/materials';
 import { getLanguageIds, mergeLanguageResources, packageLangs } from '../../helper';
 
-function SelectResourcesLanguages() {
+function SelectResourcesLanguages({ availableLanguageIds = [] }) {
   const {
     state: { languageResources },
     actions: { setLanguageResources },
@@ -22,15 +22,18 @@ function SelectResourcesLanguages() {
   };
 
   const fixedOptions = getLanguageIds();
+  const optionIds = Array.from(new Set([...fixedOptions, ...availableLanguageIds])).filter(
+    (languageId) => !!langNames[languageId]
+  );
 
   let options = [];
-  for (let key in langNames) {
+  optionIds.forEach((key) => {
     options.push({
       title: packageLangs(langNames[key]),
       id: key,
       eng: langNames[key].eng,
     });
-  }
+  });
 
   let value = [];
   languageResources.forEach((el) => {

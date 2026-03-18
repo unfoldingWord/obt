@@ -2,25 +2,11 @@ import axios from 'axios';
 
 import { fetchTcReadyRepos, getRepoSlug } from './helper';
 
-const catalogResourcesByLanguageKey = new Map();
-const catalogRequestsByLanguageKey = new Map();
+const catalogResourcesBySubjectKey = new Map();
+const catalogRequestsBySubjectKey = new Map();
 
-const isCoreDefaultResource = (resourceName = '') => {
-  const normalizedName = resourceName.toLowerCase();
-  return (
-    normalizedName.endsWith('_ult') ||
-    normalizedName.endsWith('_glt') ||
-    normalizedName.endsWith('_ust') ||
-    normalizedName.endsWith('_gst') ||
-    normalizedName.endsWith('_tn') ||
-    normalizedName.endsWith('_twl') ||
-    normalizedName.endsWith('_ta')
-  );
-};
-
-const getLanguageKey = (languageResources = [], subjects = []) => {
+const getSubjectKey = (subjects = []) => {
   return JSON.stringify({
-    languages: [...languageResources].sort(),
     subjects: [...subjects].sort(),
   });
 };
@@ -58,12 +44,22 @@ const mapCatalogResource = (resource) => {
 };
 
 export const filterResourcesByLanguage = (resources = [], languageResources = []) => {
+  if (!Array.isArray(languageResources) || languageResources.length === 0) {
+    return resources;
+  }
+
   return (resources || []).filter((resource) =>
     hasSelectedLanguage(languageResources, resource.languageId)
   );
 };
 
-export const fetchCatalogResources = async (server, languageResources, subjects) => {
+export const getCatalogLanguageIds = (resources = []) => {
+  return Array.from(
+    new Set((resources || []).map((resource) => resource.languageId).filter(Boolean))
+  );
+};
+
+export const fetchCatalogResources = async (server, subjects) => {
   const tcReadyRepos = await fetchTcReadyRepos(server);
   const response = await axios.get(
     `${server}/api/v1/catalog/search?limit=1000&sort=lang,title&subject=${subjects.join(
@@ -73,38 +69,43 @@ export const fetchCatalogResources = async (server, languageResources, subjects)
 
   return (response?.data?.data || [])
     .map(mapCatalogResource)
-    .filter(
-      (resource) =>
-        (tcReadyRepos.has(getRepoSlug(resource.owner, resource.name)) ||
-          isCoreDefaultResource(resource.name)) &&
-        hasSelectedLanguage(languageResources, resource.languageId)
-    );
+    .filter((resource) => tcReadyRepos.has(getRepoSlug(resource.owner, resource.name)));
 };
 
-export const loadCatalogResources = async (server, languageResources, subjects) => {
-  const languageKey = getLanguageKey(languageResources, subjects);
+const loadCatalogResourceIndex = async (server, subjects) => {
+  const subjectKey = getSubjectKey(subjects);
 
-  if (catalogResourcesByLanguageKey.has(languageKey)) {
-    return catalogResourcesByLanguageKey.get(languageKey);
+  if (catalogResourcesBySubjectKey.has(subjectKey)) {
+    return catalogResourcesBySubjectKey.get(subjectKey);
   }
 
-  if (!catalogRequestsByLanguageKey.has(languageKey)) {
-    const request = fetchCatalogResources(server, languageResources, subjects)
+  if (!catalogRequestsBySubjectKey.has(subjectKey)) {
+    const request = fetchCatalogResources(server, subjects)
       .then((resources) => {
-        catalogResourcesByLanguageKey.set(languageKey, resources);
+        catalogResourcesBySubjectKey.set(subjectKey, resources);
         return resources;
       })
       .finally(() => {
-        catalogRequestsByLanguageKey.delete(languageKey);
+        catalogRequestsBySubjectKey.delete(subjectKey);
       });
 
-    catalogRequestsByLanguageKey.set(languageKey, request);
+    catalogRequestsBySubjectKey.set(subjectKey, request);
   }
 
-  return catalogRequestsByLanguageKey.get(languageKey);
+  return catalogRequestsBySubjectKey.get(subjectKey);
+};
+
+export const loadCatalogResources = async (server, languageResources, subjects) => {
+  const resources = await loadCatalogResourceIndex(server, subjects);
+  return filterResourcesByLanguage(resources, languageResources);
+};
+
+export const loadCatalogLanguageIds = async (server, subjects) => {
+  const resources = await loadCatalogResourceIndex(server, subjects);
+  return getCatalogLanguageIds(resources);
 };
 
 export const resetCatalogResourceLoaderForTests = () => {
-  catalogRequestsByLanguageKey.clear();
-  catalogResourcesByLanguageKey.clear();
+  catalogRequestsBySubjectKey.clear();
+  catalogResourcesBySubjectKey.clear();
 };

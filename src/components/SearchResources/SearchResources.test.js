@@ -5,6 +5,8 @@ import { render, waitFor } from '@testing-library/react';
 import { AppContext, ReferenceContext } from '../../context';
 import SearchResources from './SearchResources';
 
+const mockSelectResourcesLanguages = jest.fn(() => null);
+
 jest.mock('axios', () => ({
   __esModule: true,
   default: {
@@ -25,17 +27,18 @@ jest.mock('notistack', () => ({
 }));
 
 jest.mock('../../components', () => ({
-  SelectResourcesLanguages: () => null,
-  DialogUI: () => null,
+  SelectResourcesLanguages: (props) => mockSelectResourcesLanguages(props),
+  DialogUI: ({ children }) => <>{children}</>,
   FeedbackDialog: () => null,
 }));
 
 jest.mock('../../resourceCatalog', () => ({
   filterResourcesByLanguage: jest.fn((resources) => resources),
+  loadCatalogLanguageIds: jest.fn(),
   loadCatalogResources: jest.fn(),
 }));
 
-import { loadCatalogResources } from '../../resourceCatalog';
+import { loadCatalogLanguageIds, loadCatalogResources } from '../../resourceCatalog';
 
 describe('SearchResources', () => {
   const appContextValue = {
@@ -74,8 +77,10 @@ describe('SearchResources', () => {
 
   beforeEach(() => {
     loadCatalogResources.mockReset();
+    loadCatalogLanguageIds.mockReset();
     appContextValue.actions.setAppConfig.mockReset();
     appContextValue.actions.setResourcesApp.mockReset();
+    mockSelectResourcesLanguages.mockClear();
   });
 
   it('does not fetch the catalog on mount when the menu is closed', () => {
@@ -86,11 +91,18 @@ describe('SearchResources', () => {
 
   it('fetches the catalog the first time the menu is opened', async () => {
     loadCatalogResources.mockResolvedValueOnce([]);
+    loadCatalogLanguageIds.mockResolvedValueOnce(['en', 'fr']);
 
     renderSearchResources(true);
 
     await waitFor(() => {
       expect(loadCatalogResources).toHaveBeenCalledTimes(1);
+      expect(loadCatalogLanguageIds).toHaveBeenCalledTimes(1);
+      expect(mockSelectResourcesLanguages).toHaveBeenCalledWith(
+        expect.objectContaining({
+          availableLanguageIds: ['en', 'fr'],
+        })
+      );
     });
   });
 });

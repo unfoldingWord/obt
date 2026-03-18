@@ -11,7 +11,11 @@ import { SelectResourcesLanguages, DialogUI, FeedbackDialog } from '../../compon
 import { subjects, bibleSubjects, obsSubjects, langNames } from '../../config/materials';
 import { defaultCard, server, columns } from '../../config/base';
 import { getUniqueResources, packageLangs } from '../../helper';
-import { filterResourcesByLanguage, loadCatalogResources } from '../../resourceCatalog';
+import {
+  filterResourcesByLanguage,
+  loadCatalogLanguageIds,
+  loadCatalogResources,
+} from '../../resourceCatalog';
 
 import LanguageIcon from '@mui/icons-material/Language';
 
@@ -31,6 +35,7 @@ function SearchResources({ anchorEl, onClose, open }) {
   const theme = useTheme();
   const [openDialog, setOpenDialog] = useState(false);
   const [openFeedbackDialog, setOpenFeedbackDialog] = useState(false);
+  const [availableLanguageIds, setAvailableLanguageIds] = useState([]);
 
   const prevResources = useRef([]);
   const uniqueResources = getUniqueResources(appConfig, resourcesApp);
@@ -88,27 +93,48 @@ function SearchResources({ anchorEl, onClose, open }) {
 
     let isMounted = true;
     const fetchResources = async () => {
-      try {
-        const result = await loadCatalogResources(server, languageResources, subjects);
-        if (!isMounted) {
-          return;
-        }
+      const [resourcesResult, languageIdsResult] = await Promise.allSettled([
+        loadCatalogResources(server, languageResources, subjects),
+        loadCatalogLanguageIds(server, subjects),
+      ]);
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (languageIdsResult.status === 'fulfilled') {
+        setAvailableLanguageIds(languageIdsResult.value);
+      }
+
+      if (resourcesResult.status === 'fulfilled') {
+        const result = resourcesResult.value;
         setResourcesApp((prev) => {
           if (prev && result) {
             prevResources.current = prev;
           }
           return result;
         });
-      } catch (err) {
-        console.log(err);
-        setResourcesApp((prev) =>
-          filterResourcesByLanguage(prev || [], languageResources)
-        );
-        enqueueSnackbar(t('No_resources_found'), { variant: 'warning' });
+        return;
       }
+
+      console.log(resourcesResult.reason);
+      setResourcesApp((prev) =>
+        filterResourcesByLanguage(prev || [], languageResources)
+      );
+      enqueueSnackbar(t('No_resources_found'), { variant: 'warning' });
     };
 
-    fetchResources();
+    fetchResources().catch((err) => {
+      if (!isMounted) {
+        return;
+      }
+
+      console.log(err);
+      setResourcesApp((prev) =>
+        filterResourcesByLanguage(prev || [], languageResources)
+      );
+      enqueueSnackbar(t('No_resources_found'), { variant: 'warning' });
+    });
     return () => {
       isMounted = false;
     };
@@ -227,7 +253,7 @@ function SearchResources({ anchorEl, onClose, open }) {
         onClose={handleCloseDialog}
         primary={{ text: t('Ok'), onClick: handleCloseDialog }}
       >
-        <SelectResourcesLanguages />
+        <SelectResourcesLanguages availableLanguageIds={availableLanguageIds} />
         <Box
           sx={{
             marginTop: 5,
