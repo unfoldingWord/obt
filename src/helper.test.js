@@ -232,6 +232,7 @@ describe('resetWorkspace', () => {
       setLanguageResources,
       goToBookChapterVerse,
       currentLanguage: 'en',
+      currentReferenceSelected: { bookId: 'mat', chapter: 1, verse: 1 },
       resourcesApp,
       resetAll: true,
     });
@@ -242,6 +243,29 @@ describe('resetWorkspace', () => {
 
     expect(layoutUpdater(defaultLayout)).toBe(defaultLayout);
     expect(languageUpdater(prevLanguages)).toBe(prevLanguages);
+    expect(goToBookChapterVerse).not.toHaveBeenCalled();
+  });
+
+  it('navigates when the current reference differs from the default reset target', () => {
+    const resourcesApp = [
+      { languageId: 'en', owner: 'unfoldingword', name: 'en_ult' },
+      { languageId: 'en', owner: 'unfoldingword', name: 'en_ust' },
+    ];
+    const setAppConfig = jest.fn();
+    const setLanguageResources = jest.fn();
+    const goToBookChapterVerse = jest.fn();
+
+    resetWorkspace({
+      bookId: 'luk',
+      setAppConfig,
+      setLanguageResources,
+      goToBookChapterVerse,
+      currentLanguage: 'en',
+      currentReferenceSelected: { bookId: 'luk', chapter: 1, verse: 1 },
+      resourcesApp,
+      resetAll: false,
+    });
+
     expect(goToBookChapterVerse).toHaveBeenCalledWith('mat', 1, 1);
   });
 });

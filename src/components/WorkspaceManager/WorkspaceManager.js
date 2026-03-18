@@ -15,7 +15,7 @@ function WorkspaceManager({ onClose }) {
 
   const {
     state: {
-      referenceSelected: { bookId },
+      referenceSelected,
     },
     actions: { goToBookChapterVerse },
   } = useContext(ReferenceContext);
@@ -24,11 +24,12 @@ function WorkspaceManager({ onClose }) {
 
   const handleReset = () => {
     resetWorkspace({
-      bookId,
+      bookId: referenceSelected.bookId,
       setAppConfig,
       setLanguageResources,
       goToBookChapterVerse,
       currentLanguage,
+      currentReferenceSelected: referenceSelected,
       resourcesApp,
       resetAll: false,
     });

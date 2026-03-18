@@ -455,7 +455,8 @@ const resetMode = (
   currentLanguage,
   setAppConfig,
   setLanguageResources,
-  goToBookChapterVerse
+  goToBookChapterVerse,
+  currentReferenceSelected
 ) => {
   setAppConfig((prev) => (isEqual(prev, defaultLayout) ? prev : defaultLayout));
 
@@ -472,11 +473,20 @@ const resetMode = (
     return mergeLanguageResources(prev, new_val);
   });
 
-  goToBookChapterVerse(
-    defaultReference[currentLanguage].bookId,
-    defaultReference[currentLanguage].chapter,
-    defaultReference[currentLanguage].verse
-  );
+  const nextReference = defaultReference[currentLanguage];
+  const shouldNavigate =
+    !currentReferenceSelected ||
+    currentReferenceSelected.bookId !== nextReference.bookId ||
+    String(currentReferenceSelected.chapter) !== String(nextReference.chapter) ||
+    String(currentReferenceSelected.verse ?? 1) !== String(nextReference.verse ?? 1);
+
+  if (shouldNavigate) {
+    goToBookChapterVerse(
+      nextReference.bookId,
+      nextReference.chapter,
+      nextReference.verse
+    );
+  }
 };
 
 /**
@@ -496,6 +506,7 @@ export const resetWorkspace = ({
   setLanguageResources,
   goToBookChapterVerse,
   currentLanguage,
+  currentReferenceSelected,
   resourcesApp: resourcesAppFromState,
   resetAll,
 }) => {
@@ -532,7 +543,8 @@ export const resetWorkspace = ({
         currentLanguage,
         setAppConfig,
         setLanguageResources,
-        goToBookChapterVerse
+        goToBookChapterVerse,
+        currentReferenceSelected
       );
       break;
 
@@ -548,7 +560,8 @@ export const resetWorkspace = ({
         currentLanguage,
         setAppConfig,
         setLanguageResources,
-        goToBookChapterVerse
+        goToBookChapterVerse,
+        currentReferenceSelected
       );
       break;
     case 'all':
@@ -564,7 +577,8 @@ export const resetWorkspace = ({
             currentLanguage,
             setAppConfig,
             setLanguageResources,
-            goToBookChapterVerse
+            goToBookChapterVerse,
+            currentReferenceSelected
           )
         : resetMode(
             defaultBibleLayout,
@@ -572,7 +586,8 @@ export const resetWorkspace = ({
             currentLanguage,
             setAppConfig,
             setLanguageResources,
-            goToBookChapterVerse
+            goToBookChapterVerse,
+            currentReferenceSelected
           );
       break;
     default:

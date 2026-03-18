@@ -21,7 +21,7 @@ function StartDialog() {
 
   const {
     state: {
-      referenceSelected: { bookId },
+      referenceSelected,
     },
     actions: { goToBookChapterVerse },
   } = useContext(ReferenceContext);
@@ -57,11 +57,12 @@ function StartDialog() {
   useEffect(() => {
     if (activeStep > steps.length - 1) {
       resetWorkspace({
-        bookId,
+        bookId: referenceSelected.bookId,
         setAppConfig,
         setLanguageResources,
         goToBookChapterVerse,
         currentLanguage,
+        currentReferenceSelected: referenceSelected,
         resourcesApp,
         resetAll: true,
       });
