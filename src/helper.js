@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 import {
   defaultTplBible,
@@ -37,6 +37,15 @@ export const getBookList = (bibleList, t) => {
     result.push({ key: el.identifier, name: t(el.identifier), label: t(el.identifier) });
   });
   return result;
+};
+
+export const mergeLanguageResources = (prev = [], next = []) => {
+  const normalizedNext = Array.from(new Set((next || []).filter(Boolean)));
+  const hasSameValues =
+    prev.length === normalizedNext.length &&
+    prev.every((languageId, index) => languageId === normalizedNext[index]);
+
+  return hasSameValues ? prev : normalizedNext;
 };
 
 export const getUniqueResources = (appConfig, resourcesApp) => {
@@ -448,7 +457,7 @@ const resetMode = (
   setLanguageResources,
   goToBookChapterVerse
 ) => {
-  setAppConfig(defaultLayout);
+  setAppConfig((prev) => (isEqual(prev, defaultLayout) ? prev : defaultLayout));
 
   setLanguageResources((prev) => {
     const new_val = cloneDeep(prev);
@@ -460,7 +469,7 @@ const resetMode = (
         new_val.push(el.i.split('__')[1]?.split('_')[0]);
       }
     });
-    return new_val;
+    return mergeLanguageResources(prev, new_val);
   });
 
   goToBookChapterVerse(

@@ -6,7 +6,7 @@ import { matchSorter } from 'match-sorter';
 import { AppContext } from '../../context';
 
 import { langNames } from '../../config/materials';
-import { getLanguageIds, packageLangs } from '../../helper';
+import { getLanguageIds, mergeLanguageResources, packageLangs } from '../../helper';
 
 function SelectResourcesLanguages() {
   const {
@@ -50,7 +50,7 @@ function SelectResourcesLanguages() {
         .filter((option) => fixedOptions.indexOf(option.id) === -1)
         .map((el) => el.id),
     ];
-    setLanguageResources(_languageResources);
+    setLanguageResources((prev) => mergeLanguageResources(prev, _languageResources));
   };
 
   const renderTags = (tagValue, getTagProps) =>

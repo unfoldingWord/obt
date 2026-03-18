@@ -7,7 +7,13 @@ jest.mock('axios', () => ({
 
 import axios from 'axios';
 
-import { fetchTcReadyRepos, getRepoSlug, getDefaultBibleLayout } from './helper';
+import {
+  fetchTcReadyRepos,
+  getRepoSlug,
+  getDefaultBibleLayout,
+  mergeLanguageResources,
+  resetWorkspace,
+} from './helper';
 
 describe('getRepoSlug', () => {
   it('normalizes mixed-case owner and repo names', () => {
@@ -187,5 +193,55 @@ describe('getDefaultBibleLayout', () => {
         i: 'unfoldingword__en_twl',
       }),
     ]);
+  });
+});
+
+describe('mergeLanguageResources', () => {
+  it('returns the previous array when the selected languages are unchanged', () => {
+    const prev = ['en'];
+
+    expect(mergeLanguageResources(prev, ['en'])).toBe(prev);
+  });
+
+  it('deduplicates new selections while preserving order', () => {
+    expect(mergeLanguageResources(['en'], ['en', 'fr', 'fr', 'es'])).toEqual([
+      'en',
+      'fr',
+      'es',
+    ]);
+  });
+});
+
+describe('resetWorkspace', () => {
+  it('avoids replacing layout and language state when reset target already matches', () => {
+    const resourcesApp = [
+      { languageId: 'en', owner: 'unfoldingword', name: 'en_ult' },
+      { languageId: 'en', owner: 'unfoldingword', name: 'en_ust' },
+      { languageId: 'en', owner: 'unfoldingword', name: 'en_tn' },
+      { languageId: 'en', owner: 'unfoldingword', name: 'en_twl' },
+      { languageId: 'en', owner: 'unfoldingword', name: 'en_ta' },
+    ];
+    const defaultLayout = getDefaultBibleLayout('en', resourcesApp);
+    const setAppConfig = jest.fn();
+    const setLanguageResources = jest.fn();
+    const goToBookChapterVerse = jest.fn();
+
+    resetWorkspace({
+      bookId: 'mat',
+      setAppConfig,
+      setLanguageResources,
+      goToBookChapterVerse,
+      currentLanguage: 'en',
+      resourcesApp,
+      resetAll: true,
+    });
+
+    const layoutUpdater = setAppConfig.mock.calls[0][0];
+    const languageUpdater = setLanguageResources.mock.calls[0][0];
+    const prevLanguages = ['en'];
+
+    expect(layoutUpdater(defaultLayout)).toBe(defaultLayout);
+    expect(languageUpdater(prevLanguages)).toBe(prevLanguages);
+    expect(goToBookChapterVerse).toHaveBeenCalledWith('mat', 1, 1);
   });
 });

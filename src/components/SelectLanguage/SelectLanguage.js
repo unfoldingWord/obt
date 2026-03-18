@@ -1,12 +1,12 @@
 import React, { useContext, useEffect } from 'react';
 
 import { FormControl, Select, InputLabel, MenuItem } from '@mui/material';
-import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
 import { AppContext } from '../../context/AppContext';
 
 import { languages } from '../../config/base';
+import { mergeLanguageResources } from '../../helper';
 
 import LanguageRoundedIcon from '@mui/icons-material/LanguageRounded';
 
@@ -24,11 +24,7 @@ export default function SelectLanguage({ label, style }) {
   };
   useEffect(() => {
     setLanguageResources((prev) => {
-      const new_val = cloneDeep(prev);
-      if (!new_val.includes(currentLanguage)) {
-        new_val.push(currentLanguage);
-      }
-      return new_val;
+      return mergeLanguageResources(prev, [...prev, currentLanguage]);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage]);
