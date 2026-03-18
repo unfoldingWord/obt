@@ -94,6 +94,9 @@ export function AppContextProvider({ children }) {
   const [resourcesApp, setResourcesApp] = useState(() => {
     return _resourcesApp;
   });
+  const [initialResourcesLoading, setInitialResourcesLoading] = useState(
+    () => _resourcesApp.length === 0
+  );
 
   const _resourceLinks = getResources(appConfig, resourcesApp);
   const [resourceLinks, setResourceLinks] = useState(_resourceLinks);
@@ -254,6 +257,7 @@ export function AppContextProvider({ children }) {
       resourceLinks,
       resourcesApp,
       resources,
+      initialResourcesLoading,
       _resourceLinks,
       showBookSelect,
       showChapterSelect,
@@ -287,6 +291,7 @@ export function AppContextProvider({ children }) {
       setResourceLinks,
       setResourcesApp,
       setResources,
+      setInitialResourcesLoading,
       setShowBookSelect,
       setShowChapterSelect,
       setShowErrorReport,

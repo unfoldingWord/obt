@@ -22,8 +22,8 @@ import LanguageIcon from '@mui/icons-material/Language';
 
 function SearchResources({ anchorEl, onClose, open }) {
   const {
-    state: { appConfig, resourcesApp, languageResources },
-    actions: { setAppConfig, setResourcesApp },
+    state: { appConfig, resourcesApp, languageResources, initialResourcesLoading },
+    actions: { setAppConfig, setResourcesApp, setInitialResourcesLoading },
   } = useContext(AppContext);
 
   const {
@@ -102,6 +102,7 @@ function SearchResources({ anchorEl, onClose, open }) {
 
   useEffect(() => {
     const fetchResources = async () => {
+      const isInitialLoad = initialResourcesLoading;
       try {
         const tcReadyRepos = await fetchTcReadyRepos(server);
         const res = await axios.get(
@@ -141,6 +142,10 @@ function SearchResources({ anchorEl, onClose, open }) {
           (prev || []).filter((resource) => hasSelectedLanguage(resource.languageId))
         );
         enqueueSnackbar(t('No_resources_found'), { variant: 'warning' });
+      } finally {
+        if (isInitialLoad) {
+          setInitialResourcesLoading(false);
+        }
       }
     };
 
