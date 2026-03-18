@@ -8,7 +8,13 @@ import { useTranslation } from 'react-i18next';
 
 import { ReferenceContext } from '../context';
 
-import { getResources, getBookList, checkLSVal, getLayoutType } from '../helper';
+import {
+  getResources,
+  getBookList,
+  checkLSVal,
+  getLayoutType,
+  getDefaultBibleLayout,
+} from '../helper';
 import {
   defaultTplBible,
   defaultTplOBS,
@@ -22,6 +28,19 @@ export const AppContext = React.createContext();
 const _currentLanguage = checkLSVal('i18nextLng', languages[0]);
 const _fontSize = parseInt(localStorage.getItem('fontSize'));
 const _layoutStorage = localStorage.getItem('layoutStorage');
+const _resourcesApp = checkLSVal('resourcesApp', [], 'object');
+
+const getLayoutSignature = (layout = {}) => {
+  return ['lg', 'md', 'sm']
+    .map((breakpoint) =>
+      (layout?.[breakpoint] || [])
+        .map(({ i, w, h, x, y }) => `${i}:${w}:${h}:${x}:${y}`)
+        .sort()
+        .join('|')
+    )
+    .join('||');
+};
+
 export function AppContextProvider({ children }) {
   const {
     state: { referenceSelected },
@@ -37,7 +56,7 @@ export function AppContextProvider({ children }) {
       checkLSVal(
         'appConfig',
         {
-          bible: defaultTplBible[_currentLanguage],
+          bible: getDefaultBibleLayout(_currentLanguage, _resourcesApp),
           obs: defaultTplOBS[_currentLanguage],
         },
         'object',
@@ -73,8 +92,11 @@ export function AppContextProvider({ children }) {
    * 3. Maybe make availableBookList in ResourceContext
    */
   const [resourcesApp, setResourcesApp] = useState(() => {
-    return checkLSVal('resourcesApp', [], 'object');
+    return _resourcesApp;
   });
+  const [initialResourcesLoading, setInitialResourcesLoading] = useState(
+    () => _resourcesApp.length === 0
+  );
 
   const _resourceLinks = getResources(appConfig, resourcesApp);
   const [resourceLinks, setResourceLinks] = useState(_resourceLinks);
@@ -159,6 +181,42 @@ export function AppContextProvider({ children }) {
   }, [referenceSelected.bookId]);
 
   useEffect(() => {
+    if (referenceSelected.bookId === 'obs' || !resourcesApp.length) {
+      return;
+    }
+
+    const fallbackLayout = defaultTplBible[currentLanguage];
+    const hasFallbackLayout =
+      getLayoutSignature(appConfig) === getLayoutSignature(fallbackLayout);
+    if (!hasFallbackLayout) {
+      return;
+    }
+
+    const nextBibleLayout = getDefaultBibleLayout(currentLanguage, resourcesApp);
+    const isUpgradedLayout =
+      getLayoutSignature(nextBibleLayout) !== getLayoutSignature(fallbackLayout);
+    if (!isUpgradedLayout) {
+      return;
+    }
+
+    setAppConfig(nextBibleLayout);
+    try {
+      const appConfigStr = localStorage.getItem('appConfig');
+      const parsedConfig = appConfigStr ? JSON.parse(appConfigStr) : {};
+      localStorage.setItem(
+        'appConfig',
+        JSON.stringify({
+          ...parsedConfig,
+          bible: nextBibleLayout,
+        })
+      );
+    } catch (error) {
+      // keep state update even if localStorage parse fails
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resourcesApp, currentLanguage, referenceSelected.bookId]);
+
+  useEffect(() => {
     setResourceLinks(getResources(appConfig, resourcesApp));
   }, [appConfig, resourcesApp, breakpoint]);
 
@@ -199,6 +257,7 @@ export function AppContextProvider({ children }) {
       resourceLinks,
       resourcesApp,
       resources,
+      initialResourcesLoading,
       _resourceLinks,
       showBookSelect,
       showChapterSelect,
@@ -232,6 +291,7 @@ export function AppContextProvider({ children }) {
       setResourceLinks,
       setResourcesApp,
       setResources,
+      setInitialResourcesLoading,
       setShowBookSelect,
       setShowChapterSelect,
       setShowErrorReport,

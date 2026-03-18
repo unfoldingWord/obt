@@ -16,7 +16,7 @@ function StartDialog() {
 
   const {
     actions: { setOpenStartDialog, setLoadIntro, setAppConfig, setLanguageResources },
-    state: { openStartDialog, currentLanguage },
+    state: { openStartDialog, currentLanguage, resourcesApp },
   } = useContext(AppContext);
 
   const {
@@ -62,6 +62,7 @@ function StartDialog() {
         setLanguageResources,
         goToBookChapterVerse,
         currentLanguage,
+        resourcesApp,
         resetAll: true,
       });
       handleClose();

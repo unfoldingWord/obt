@@ -8,7 +8,7 @@ import { DialogUI } from '../../components';
 import InfoRoundedIcon from '@mui/icons-material/InfoRounded';
 
 import changeLog from '../../docs/CHANGELOG.md';
-import * as PACKAGE_JSON from '../../../package.json';
+import packageJson from '../../../package.json';
 
 function About({ open, setOpen, handleClick }) {
   const [log, setLog] = useState();
@@ -25,8 +25,8 @@ function About({ open, setOpen, handleClick }) {
     setOpen(false);
   };
 
-  const textLabel = PACKAGE_JSON
-    ? `v${PACKAGE_JSON?.default?.version}`
+  const textLabel = packageJson
+    ? `v${packageJson?.version}`
     : `Information about application`;
 
   return (
@@ -41,9 +41,9 @@ function About({ open, setOpen, handleClick }) {
         open={open}
         maxWidth={'sm'}
         onClose={handleClose}
-        title={`About v${PACKAGE_JSON?.default?.version}`}
+        title={`About v${packageJson?.version}`}
       >
-        {PACKAGE_JSON?.default?.description}
+        {packageJson?.description}
         <ReactMarkdown className={'md'}>
           {log ? log.text : 'Version of application'}
         </ReactMarkdown>

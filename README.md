@@ -1,293 +1,219 @@
-<div id="top"></div>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
+# Open Bible Text
 
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
+![Open Bible Text logo](./src/docs/images/logo_obt.png)
 
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/texttree/bsa">
-    <img src="./src/docs/images/logo_obt.png" alt="Logo" width="128" height="128">
-  </a>
+Open Bible Text (OBT) is a React web application for reading and studying Scripture and Open Bible Stories with open resources from Door43.
 
-  <h3 align="center">OPEN BIBLE TEXT</h3>
+It is designed for translators, reviewers, and church users who need to compare multiple resources side by side, save layouts, and share study workspaces.
 
-  <p align="center">
-    An application for advanced Bible study using opensource materials from git.door43.org.
-    <br />
-    <br />
-    <a href="https://openbibletext.com/">View Production</a>
-    ·
-    <a href="https://develop--tt-bsa.netlify.app/">View Develop</a>
-    ·
-    <a href="https://github.com/texttree/bsa/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/texttree/bsa/issues">Request Feature</a>
-  </p>
-</div>
+## Links
 
-<p align="center">
-  <a href="https://crowdin.com/project/obt">Help us translate - Crowdin</a>
-</p>
+- Production: [openbibletext.com](https://openbibletext.com/)
+- Repository: [github.com/unfoldingWord/obt](https://github.com/unfoldingWord/obt)
+- Issues: [github.com/unfoldingWord/obt/issues](https://github.com/unfoldingWord/obt/issues)
+- Translation project: [Crowdin](https://crowdin.com/project/obt)
+- Changelog: [src/docs/CHANGELOG.md](./src/docs/CHANGELOG.md)
 
-***
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
+## What the app does
 
-***
-<!-- ABOUT THE PROJECT -->
-## About The Project
+- Opens Bible and OBS resources from Door43 in a multi-card workspace
+- Supports parallel reading of literal text, simplified text, translation notes, translation academy, translation words links, and other available resources
+- Provides first-run guidance with an in-app walkthrough
+- Shows an initial loading indicator on cold startup so first load does not look frozen
+- Saves layouts locally and supports importing or sharing layouts by URL
+- Lets users reset cards back to the default workspace for the current mode
+- Supports multiple interface languages through i18next and Crowdin-managed translations
+- Includes typo reporting and feedback flows for supported deployments
 
-**Purpose**
-- Enable churches to read and study Scripture and OBS in their own language using all the opensource materials from git.door43.org
+## Default study layout
 
-- Give translators the opportunity study the Scriptures using all the opensource materials from git.door43.org
+When no saved Bible layout exists and the necessary English core resources are available, OBT opens a five-card default workspace:
 
-**Problem**
-- There are many resources that are already translated, but there was no tool for easy reading and learning
-- Small nations do not always have the resources to publish their work
+- Left third: literal translation, full height
+- Middle third: simplified translation above translation words links
+- Right third: translation notes above translation academy
 
-**Scope**
-- Local second (Windows, Mac, Linux)
-  - Downloadable
-  - Also usable online
-  - Sideloading
-- Full book package support for browsing, viewing, listening
-- Proskomma (search, versification, etc.)
-- Text Annotator (shareable user generated notes) via Datatable editable
-- Scripture commenting/reporting system
-- Progressive Web App
-- Downloadable for language-resource combinations via Catalog Next React Toolkit
+If one or more of those resources are unavailable, the app falls back to opening the core resources that are available instead of showing an incomplete or blank workspace.
 
-**Background**
-- We wanted to make a website that would help share the work done and help spread the Gospel
+## Technology stack
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+- React 18
+- CRACO on top of Create React App
+- Material UI v4 and MUI v7-based dependencies
+- Netlify Functions for feedback delivery in hosted environments
+- Workbox service worker support
+- Door43 / DCS-hosted content and related resource component libraries
 
-***
-### Built With
+## Data and external services
 
-* [React.js](https://reactjs.org/)
-* [Material-UI](https://v4.mui.com/)
+OBT does not require a local database to run. The app primarily reads resource metadata and content from Door43/DCS-hosted repositories.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+Optional integrations:
 
-<!-- GETTING STARTED -->
-***
-## Getting Started
+- Typo reporting backend via `REACT_APP_SERVER_LINK`
+- Netlify feedback function backed by Telegram via `API_TELEGRAM_TOKEN` and `GROUP_TELEGRAM`
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-
-<br/>
+## Getting started
 
 ### Prerequisites
 
-All data in OPEN BIBLE TEXT is taken from [Door43 Catalog](https://git.door43.org/catalog)
+Use a current Node.js and npm environment. Netlify is currently building this app with Node `22.22.1`, and local development has been validated with modern npm-based installs.
 
-<br/>
+You will need:
 
-#### Data
+- Node.js 20+ or 22+
+- npm
 
-- The source must be cloned from its repository
-- `yarn install` is used to resolve/install dependencies
-- `yarn start` is used to start the local server listening on `localhost:3000`
+### Installation
 
-<br/>
+1. Clone the repository.
 
-#### Local
+```bash
+git clone https://github.com/unfoldingWord/obt.git
+cd obt
+```
 
-- [Yarn](https://yarnpkg.com/) 1.x: please refer to their [installation guide](https://classic.yarnpkg.com/en/docs/install).
+2. Install dependencies.
 
-<br/>
+```bash
+npm install
+```
 
-### Installation/First Steps
+3. Copy the example environment file.
 
-1. Clone the repo
-   ```bash
-   git clone https://github.com/texttree/bsa.git
-   ```
-2. Install NPM packages
-   ```bash
-   yarn install
-   ```
-3. Copy `.env.example` and rename it
+```bash
+cp .env.example .env
+```
 
-4. Run the project with the command
-   ```bash
-   yarn start
-   ```
-### Additional setting
+4. Start the development server.
 
-#### Configuring Error Sending
+```bash
+npm start
+```
 
-1. Configuring backend for error reporting:
-https://github.com/texttree/tsv-send-backend
+The app runs at `http://localhost:3000` by default.
 
-2. Enter your URL in `.env` file in `REACT_APP_SERVER_LINK` variable
+## Environment variables
 
-#### Configuring Feedback Sending
+The app can run with no secrets for basic local UI work, but some feedback/reporting features require configuration.
 
-In our environment, we use lambda functions netlify and telegram bot.
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `REACT_APP_SERVER_LINK` | Optional | Endpoint used by typo reporting |
+| `GENERATE_SOURCEMAP` | Optional | Set to `false` to reduce build artifact size |
+| `API_TELEGRAM_TOKEN` | Optional for Netlify feedback | Telegram bot token used by `netlify/functions/sendFeedback.js` |
+| `GROUP_TELEGRAM` | Optional for Netlify feedback | Telegram chat ID used by `netlify/functions/sendFeedback.js` |
 
-You need to specify the bot token and chat ID in the `.env` file in `API_TELEGRAM_TOKEN` and `GROUP_TELEGRAM` variables
+Example values are provided in [`.env.example`](./.env.example).
 
-#### Set up new language support
+## Available scripts
 
-You can configure resource language support in the `config` folder
+| Command | Purpose |
+| --- | --- |
+| `npm start` | Run the app locally in development mode |
+| `npm run build` | Create a production build |
+| `npm test` | Run the test suite through CRACO |
+| `npm run serve` | Serve the built app locally |
+| `npm run analyze` | Inspect production bundle composition |
 
-__In progress...__
+## Local development workflow
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+Typical maintainer workflow:
 
-***
-<!-- USAGE EXAMPLES -->
-## Usage/Integration
+1. Run `npm install`
+2. Run `npm start`
+3. Validate behavior in the browser
+4. Run focused tests or the full test suite with `npm test`
+5. Run `CI=true npm run build` before pushing release-sensitive changes
 
-#### User`s guide
+Using `CI=true` locally matters because Create React App treats warnings as build failures in CI environments.
 
-<p align="center"><img src="./src/docs/images/interactive_guide.png">	</p>
+## Deployment notes
 
-#### Select BIBLE/OBS mode
+### Netlify
 
-<p align="center"><img src="./src/docs/images/obs.png">	</p>
+The repository includes a Netlify function at [netlify/functions/sendFeedback.js](./netlify/functions/sendFeedback.js).
 
-#### Main menu
+For hosted feedback submission to work, the deployment environment must provide:
 
-<p align="center"><img src="./src/docs/images/main_menu.png">	</p>
+- `API_TELEGRAM_TOKEN`
+- `GROUP_TELEGRAM`
 
-#### Add resources
+The production build is generated with:
 
-<p align="center"><img src="./src/docs/images/add_resource_languages.png">	</p>
+```bash
+npm run build
+```
 
-#### Settings
+To smoke-test the production artifact locally:
 
-<p align="center"><img src="./src/docs/images/settings.png">	</p>
+```bash
+npm run build
+npm run serve
+```
 
-#### Layout list
+### Typo reporting backend
 
-<p align="center"><img src="./src/docs/images/layout_list.png">	</p>
+Typo reporting is separate from the Netlify feedback function. If you want typo-report submissions to work, point `REACT_APP_SERVER_LINK` at a compatible backend.
 
-#### Import layout
+The historic backend reference in this project is [texttree/tsv-send-backend](https://github.com/texttree/tsv-send-backend).
 
-<p align="center"><img src="./src/docs/images/import_layout.png">	</p>
+## User-facing capabilities
 
-#### Report a typo
+### Study modes
 
-<p align="center"><img src="./src/docs/images/error_message.png">	</p>
+- Bible mode
+- OBS mode
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+### Workspace behavior
 
-***
-<!-- ROADMAP -->
-## Roadmap
+- Add cards from the main menu
+- Rearrange cards in a responsive grid layout
+- Save and restore layouts
+- Import a shared layout
+- Generate a shareable layout URL
+- Reset cards back to the default layout for the active mode
 
-See the [open issues](https://github.com/texttree/bsa/issues) for a full list of proposed features (and known issues).
+### First-run experience
 
-This project uses Zenhub to manage the roadmap.
+- Guided walkthrough for new users
+- Immediate startup loader on cold load
+- Loading placeholders while initial resources are still being discovered
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+## Project structure
 
-***
-<!-- CONTRIBUTING -->
+```text
+.
+├── netlify/functions/      # Hosted feedback function
+├── public/                 # HTML shell and static assets
+├── src/
+│   ├── components/         # UI components
+│   ├── config/             # locale and app configuration
+│   ├── context/            # application state context
+│   ├── docs/               # changelog, images, supporting docs
+│   ├── helper.js           # layout/resource helper logic
+│   └── styles/             # app styling
+├── craco.config.js         # webpack and build overrides
+├── package.json            # scripts and dependencies
+└── README.md
+```
+
+## Known maintenance realities
+
+- Some shared resource-component dependencies are coordinated across multiple projects, so dependency upgrades may require team agreement rather than project-local changes.
+- CI and Netlify builds are sensitive to warnings because Create React App treats warnings as errors when `CI=true`.
+- Runtime behavior depends on resource availability in external Door43 repositories, so startup and default layout behavior must tolerate missing repositories.
+
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.  [Guidelines for external contributions.](https://forum.door43.org)
+1. Create a branch from `develop`
+2. Make the change
+3. Run the relevant tests and `CI=true npm run build`
+4. Update [src/docs/CHANGELOG.md](./src/docs/CHANGELOG.md) when the change affects a release
+5. Open a pull request
 
-You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
+Use [github.com/unfoldingWord/obt/issues](https://github.com/unfoldingWord/obt/issues) for bugs and feature requests.
 
-If you would like to fork the repo and create a pull request.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-***
-<!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-***
-<!-- CONTACT -->
-## Contact
-
-Texttree - [Discord](https://discord.com/channels/867746700390563850/894978969613520956)
-
-Help us translate - [Crowdin](https://crowdin.com/project/obt)
-
-Project Link: [https://github.com/texttree/bsa](https://github.com/texttree/bsa)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-***
-## Acknowledgments
-
-* [unfoldingWord](https://github.com/unfoldingWord)
-* [Zach P](https://github.com/ancientTexts-net)
-* [Klappy](https://github.com/klappy)
-* [Abel Pérez](https://github.com/abelpz)
-* [Mark Howe](https://github.com/mvahowe)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/texttree/bsa.svg?style=for-the-badge
-[contributors-url]: https://github.com/texttree/bsa/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/texttree/bsa.svg?style=for-the-badge
-[forks-url]: https://github.com/texttree/bsa/network/members
-[stars-shield]: https://img.shields.io/github/stars/texttree/bsa.svg?style=for-the-badge
-[stars-url]: https://github.com/texttree/bsa/stargazers
-[issues-shield]: https://img.shields.io/github/issues/texttree/bsa.svg?style=for-the-badge
-[issues-url]: https://github.com/texttree/bsa/issues
-[license-shield]: https://img.shields.io/github/license/texttree/bsa.svg?style=for-the-badge
-[license-url]: https://github.com/texttree/bsa/blob/master/LICENSE
+Distributed under the MIT License. See [LICENSE](./LICENSE).

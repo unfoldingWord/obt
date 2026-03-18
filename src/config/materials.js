@@ -338,16 +338,6 @@ export const langNames = {
   },
 };
 
-//resource, that have not manifest or others reason
-export const blackListResources = [
-  { owner: 'unfoldingword', name: 'BHP' },
-  { owner: 'unfoldingword', name: 'en_ueb' },
-  { owner: 'wycliffeassociates', name: 'en_ulb' },
-  { owner: 'wycliffeassociates', name: 'en_udb' },
-  { owner: 'wycliffeassociates', name: 'en_tw' },
-  //  { owner: 'DevleskoDrom', name: 'rml_obs' },
-];
-
 /* CORE */
 
 export const bibleSubjects = [
